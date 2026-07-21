@@ -266,7 +266,11 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					265CA74A396E8899FD0B5423 = {
+						DevelopmentTeam = 3L7TNSC992;
 						ProvisioningStyle = Automatic;
+					};
+					B846B2A9719009E32CAF1E7D = {
+						DevelopmentTeam = 3L7TNSC992;
 					};
 				};
 			};
@@ -363,13 +367,14 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplayTests;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.cozybrian.cozyplayTests;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
 			};
@@ -382,12 +387,13 @@
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplay;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.cozybrian.cozyplay;
 				PRODUCT_NAME = cozyplay;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
@@ -526,12 +532,13 @@
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplay;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.cozybrian.cozyplay;
 				PRODUCT_NAME = cozyplay;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
@@ -543,13 +550,14 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplayTests;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.cozybrian.cozyplayTests;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
 			};
