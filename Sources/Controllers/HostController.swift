@@ -27,6 +27,10 @@ final class HostController: ObservableObject {
 
     func start() {
         meter.onLevel = { [weak self] in self?.level = $0 }
+        // ORDER IS LOAD-BEARING: startEngine() starts local playback, which
+        // registers this process with coreaudiod — required for the tap's
+        // self-exclusion PID translation in startCapture(). Reversing this can
+        // make the tap capture (and mute) our own output.
         startEngine()
         startCapture()
     }

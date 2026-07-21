@@ -26,9 +26,12 @@ final class TimelineRingBuffer {
     private var scratch: [UnsafeMutablePointer<Float>] = []
     private let scratchCapacity = 8_192
 
-    // Cross-thread positions (see RTAtomics.h).
+    // Cross-thread positions and counters (see RTAtomics.h).
     private let readPositionStorage = UnsafeMutablePointer<Int64>.allocate(capacity: 1)
     private let writeHeadStorage = UnsafeMutablePointer<Int64>.allocate(capacity: 1)
+    private let lateDropsStorage = UnsafeMutablePointer<Int64>.allocate(capacity: 1)
+    private let earlyDropsStorage = UnsafeMutablePointer<Int64>.allocate(capacity: 1)
+    private let writesOKStorage = UnsafeMutablePointer<Int64>.allocate(capacity: 1)
 
     init() {
         for _ in 0..<channelCount {
@@ -41,6 +44,9 @@ final class TimelineRingBuffer {
         }
         readPositionStorage.initialize(to: 0)
         writeHeadStorage.initialize(to: 0)
+        lateDropsStorage.initialize(to: 0)
+        earlyDropsStorage.initialize(to: 0)
+        writesOKStorage.initialize(to: 0)
     }
 
     deinit {
@@ -48,6 +54,9 @@ final class TimelineRingBuffer {
         scratch.forEach { $0.deallocate() }
         readPositionStorage.deallocate()
         writeHeadStorage.deallocate()
+        lateDropsStorage.deallocate()
+        earlyDropsStorage.deallocate()
+        writesOKStorage.deallocate()
     }
 
     // MARK: Positions
@@ -67,6 +76,11 @@ final class TimelineRingBuffer {
 
     /// Frames of real audio ahead of the reader (diagnostics).
     var bufferedFrames: Int64 { max(0, writeHead - readPosition) }
+
+    // Diagnostics counters.
+    var lateDrops: Int64 { rt_atomic_load(lateDropsStorage) }
+    var earlyDrops: Int64 { rt_atomic_load(earlyDropsStorage) }
+    var writesOK: Int64 { rt_atomic_load(writesOKStorage) }
 
     /// Reset positions and silence the ring (anchor change / reconnect).
     /// Caller must guarantee the render thread is not mid-read (engine stopped).
@@ -89,8 +103,14 @@ final class TimelineRingBuffer {
         guard frames > 0, frames <= scratchCapacity else { return false }
 
         let readPos = readPosition
-        if position + Int64(frames) <= readPos { return false }           // fully late
-        if position - readPos > Int64(Self.capacityFrames - frames) { return false }  // absurdly early
+        if position + Int64(frames) <= readPos {                          // fully late
+            _ = rt_atomic_add(lateDropsStorage, 1)
+            return false
+        }
+        if position - readPos > Int64(Self.capacityFrames - frames) {     // absurdly early
+            _ = rt_atomic_add(earlyDropsStorage, 1)
+            return false
+        }
 
         // Deinterleave + scale S16 → Float32 into scratch.
         data.withUnsafeBytes { (raw: UnsafeRawBufferPointer) in
@@ -106,6 +126,7 @@ final class TimelineRingBuffer {
         if position + Int64(frames) > writeHead {
             writeHead = position + Int64(frames)
         }
+        _ = rt_atomic_add(writesOKStorage, 1)
         return true
     }
 

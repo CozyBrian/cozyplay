@@ -1,5 +1,6 @@
 import Foundation
 import Network
+import os.log
 
 /// The host-side engine: owns the party's TCP listener (which both advertises
 /// `_cozyplay._tcp` over Bonjour and accepts joiners), fans captured audio out
@@ -14,6 +15,20 @@ final class AudioServer {
     var onSpeakers: (([Speaker]) -> Void)?
     var onReady: ((UInt16) -> Void)?
     var onError: ((String) -> Void)?
+    /// Local playback died/recovered after a device change (nil = recovered).
+    var onLocalPlaybackIssue: ((String?) -> Void)?
+    /// 1/s engine health snapshot for the diagnostics UI.
+    var onDiagnostics: ((HostDiagnostics) -> Void)?
+
+    struct HostDiagnostics {
+        var localPlayback: PlaybackEngine.Diagnostics
+        var sessions: [SessionInfo]
+        struct SessionInfo {
+            var name: String
+            var inFlightChunks: Int
+            var skippedChunks: Int
+        }
+    }
 
     let partyName: String
     let localName: String
@@ -58,7 +73,10 @@ final class AudioServer {
     private var states: [String: SpeakerState] = [:]
     private static let statesDefaultsKey = "cozyplay.speakerStates"
 
-    private let maxInFlightChunks = 25            // ~500ms of audio stuck in flight
+    /// Chunks queued beyond what could still arrive before their deadline are
+    /// pointless — skip instead of queueing. bufferMs/20 chunks fill the whole
+    /// buffer; +5 gives slack for send-completion latency.
+    private var maxInFlightChunks: Int { _bufferMs / 20 + 5 }
     private let saturationLimitNs: UInt64 = 5_000_000_000
 
     private final class ClientSession {
@@ -66,21 +84,31 @@ final class AudioServer {
         let reader = FrameReader()
         var hello: HelloMessage?
         var inFlightChunks = 0
+        var skippedChunks = 0
         var saturatedSinceNs: UInt64?
         var lastActivityNs = HostClock.nowNs()
         init(connection: NWConnection) { self.connection = connection }
     }
 
-    private var livenessTimer: DispatchSourceTimer?
+    private var maintenanceTimer: DispatchSourceTimer?
     private let livenessLimitNs: UInt64 = 5_000_000_000
 
-    init(partyName: String, localName: String, localHostID: String) {
+    init(
+        partyName: String,
+        localName: String,
+        localHostID: String,
+        bufferMs: Int = EngineConstants.defaultBufferMs
+    ) {
         self.partyName = partyName
         self.localName = localName
         self.localHostID = localHostID
+        self._bufferMs = max(EngineConstants.minBufferMs, min(EngineConstants.maxBufferMs, bufferMs))
         states = Self.loadStates()
         if states[localHostID] == nil {
             states[localHostID] = SpeakerState(name: "\(localName) (host)")
+        }
+        localPlayback.onPlaybackIssue = { [weak self] message in
+            self?.onLocalPlaybackIssue?(message)   // already on main
         }
     }
 
@@ -111,20 +139,30 @@ final class AudioServer {
 
         do {
             try localPlayback.start()
+            // A muted host tile from a previous session is never the intent when
+            // starting a NEW party — clear it (volume is preserved).
+            if var localState = states[localHostID], localState.muted {
+                localState.muted = false
+                states[localHostID] = localState
+                saveStates()
+            }
             if let localState = states[localHostID] {
                 localPlayback.volumePercent = localState.volumePercent
                 localPlayback.muted = localState.muted
                 localPlayback.latencyTrimMs = localState.latencyMs
+                log.info("local playback started: volume=\(localState.volumePercent)% muted=\(localState.muted) trim=\(localState.latencyMs)ms")
             }
         } catch {
             // Companions can still join and play; only the host's own speakers are out.
+            log.error("local playback failed to start: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 self.onError?("This Mac's own playback couldn't start: \(error.localizedDescription)")
             }
         }
 
-        // Liveness: pings arrive 1/s per client; a session silent for 5s is gone
-        // even if TCP hasn't noticed yet.
+        // Maintenance (1/s): liveness — pings arrive 1/s per client, so a session
+        // silent for 5s is gone even if TCP hasn't noticed — plus a diagnostics
+        // snapshot for the UI/logs.
         let timer = DispatchSource.makeTimerSource(queue: netQueue)
         timer.setEventHandler { [weak self] in
             guard let self else { return }
@@ -134,13 +172,33 @@ final class AudioServer {
                     self.drop(session)
                 }
             }
+            self.emitDiagnostics()
         }
-        timer.schedule(deadline: .now() + 2, repeating: 2.0)
+        timer.schedule(deadline: .now() + 1, repeating: 1.0)
         timer.resume()
-        livenessTimer = timer
+        maintenanceTimer = timer
 
         pushRoster()
     }
+
+    private func emitDiagnostics() {
+        let snapshot = HostDiagnostics(
+            localPlayback: localPlayback.snapshotDiagnostics(),
+            sessions: sessions.compactMap { session in
+                guard let hello = session.hello else { return nil }
+                return HostDiagnostics.SessionInfo(
+                    name: states[hello.hostID]?.name ?? hello.name,
+                    inFlightChunks: session.inFlightChunks,
+                    skippedChunks: session.skippedChunks
+                )
+            }
+        )
+        let d = snapshot.localPlayback
+        log.debug("local: peak=\(d.renderPeak, format: .fixed(precision: 3)) buffered=\(d.bufferedMs)ms err=\(d.servoErrorMs, format: .fixed(precision: 2))ms writes=\(d.writesOK) late=\(d.lateDrops) under=\(d.underrunCycles) invTS=\(d.invalidTimestampCycles) jumps=\(d.jumpCount) restarts=\(d.engineRestarts)/\(d.engineRestartFailures)")
+        DispatchQueue.main.async { [weak self] in self?.onDiagnostics?(snapshot) }
+    }
+
+    private let log = Logger(subsystem: "africa.inpathgroup.cozyplay", category: "audio-server")
 
     func stop() {
         netQueue.async { [self] in
@@ -152,8 +210,8 @@ final class AudioServer {
             sessions.removeAll()
             listener?.cancel()
             listener = nil
-            livenessTimer?.cancel()
-            livenessTimer = nil
+            maintenanceTimer?.cancel()
+            maintenanceTimer = nil
             localPlayback.stop()
         }
     }
@@ -335,6 +393,7 @@ final class AudioServer {
     /// and drop the session entirely if it stays saturated.
     private func send(_ frame: Data, to session: ClientSession) {
         if session.inFlightChunks >= maxInFlightChunks {
+            session.skippedChunks += 1
             let now = HostClock.nowNs()
             if let since = session.saturatedSinceNs {
                 if now - since > saturationLimitNs { drop(session) }

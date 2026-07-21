@@ -18,4 +18,14 @@ static inline void rt_atomic_store(volatile int64_t *ptr, int64_t value) {
     __atomic_store_n(ptr, value, __ATOMIC_RELEASE);
 }
 
+/// Returns the new value.
+static inline int64_t rt_atomic_add(volatile int64_t *ptr, int64_t delta) {
+    return __atomic_add_fetch(ptr, delta, __ATOMIC_ACQ_REL);
+}
+
+/// Returns the previous value.
+static inline int64_t rt_atomic_exchange(volatile int64_t *ptr, int64_t value) {
+    return __atomic_exchange_n(ptr, value, __ATOMIC_ACQ_REL);
+}
+
 #endif /* RTAtomics_h */

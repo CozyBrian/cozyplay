@@ -19,6 +19,7 @@ final class SystemAudioTap {
         case createAggregateFailed(OSStatus)
         case readFormatFailed(OSStatus)
         case ioProcFailed(OSStatus)
+        case selfExclusionFailed
         var errorDescription: String? {
             switch self {
             case .createTapFailed(let s):      return "Couldn't create the audio tap (status \(s)). Grant audio-capture permission."
@@ -26,6 +27,7 @@ final class SystemAudioTap {
             case .createAggregateFailed(let s): return "Couldn't create the capture device (status \(s))."
             case .readFormatFailed(let s):      return "Couldn't read the tap's audio format (status \(s))."
             case .ioProcFailed(let s):          return "Couldn't start audio capture (status \(s))."
+            case .selfExclusionFailed:          return "Couldn't exclude cozyplay from its own capture. Try starting the party again."
             }
         }
     }
@@ -44,24 +46,33 @@ final class SystemAudioTap {
     private var onBuffer: ((AVAudioPCMBuffer, UInt64) -> Void)?
 
     /// Start capturing. `onBuffer` is called for each captured chunk.
-    func start(onBuffer: @escaping (AVAudioPCMBuffer, UInt64) -> Void) throws {
+    /// - Parameter keepSourceAudible: troubleshooting mode — leaves the tapped
+    ///   apps' own output audible (`.unmuted`) instead of muting them in favor
+    ///   of the engine's delayed playback. Causes doubled audio on the host.
+    func start(
+        keepSourceAudible: Bool = false,
+        onBuffer: @escaping (AVAudioPCMBuffer, UInt64) -> Void
+    ) throws {
         self.onBuffer = onBuffer
 
         // 1. Describe a stereo tap of the whole system, excluding our own process —
         //    otherwise the engine's delayed local playback would be re-captured as a
-        //    feedback/echo loop.
-        var excluded: [AudioObjectID] = []
-        if let selfObject = Self.processObject(forPID: ProcessInfo.processInfo.processIdentifier) {
-            excluded.append(selfObject)
+        //    feedback/echo loop. A failed exclusion MUST abort: with the mute below
+        //    it would silently self-mute the host AND stream an escalating echo.
+        //    (Translation requires our process to be registered with coreaudiod —
+        //    guaranteed because local playback starts before the tap; see
+        //    HostController.start().)
+        guard let selfObject = Self.processObject(forPID: ProcessInfo.processInfo.processIdentifier) else {
+            throw TapError.selfExclusionFailed
         }
-        let description = CATapDescription(stereoGlobalTapButExcludeProcesses: excluded)
+        let description = CATapDescription(stereoGlobalTapButExcludeProcesses: [selfObject])
         description.uuid = UUID()
         description.name = "cozyplay-tap"
         description.isPrivate = true
         // Mute the tapped processes' direct output: the host hears the engine's
         // *delayed* local playback instead, so it stays aligned with the
         // companions rather than running one buffer ahead of them.
-        description.muteBehavior = .mutedWhenTapped
+        description.muteBehavior = keepSourceAudible ? .unmuted : .mutedWhenTapped
 
         // 2. Create the process tap.
         var newTapID = AudioObjectID(kAudioObjectUnknown)
@@ -161,8 +172,11 @@ final class SystemAudioTap {
     private static func defaultOutputDeviceUID() -> String? {
         var deviceID = AudioObjectID(kAudioObjectUnknown)
         var size = UInt32(MemoryLayout<AudioObjectID>.size)
+        // The user's actual output device — NOT DefaultSystemOutputDevice (the
+        // alert-sounds device), which can differ and would give the aggregate
+        // the wrong clock/drift-compensation subdevice.
         var address = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwarePropertyDefaultSystemOutputDevice,
+            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
             mScope: kAudioObjectPropertyScopeGlobal,
             mElement: kAudioObjectPropertyElementMain
         )

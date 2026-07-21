@@ -18,6 +18,15 @@ final class StreamClient {
 
     /// Delivered on the main queue.
     var onState: ((ClientState) -> Void)?
+    /// ~1/s engine health snapshot for the diagnostics UI (main queue).
+    var onDiagnostics: ((StreamDiagnostics) -> Void)?
+
+    struct StreamDiagnostics {
+        var offsetMs: Double
+        var minRttMs: Double
+        var clockConverged: Bool
+        var playback: PlaybackEngine.Diagnostics
+    }
 
     private let endpoint: NWEndpoint
     private let hostID: String
@@ -157,9 +166,17 @@ final class StreamClient {
             guard let pong = WireProtocol.decodePong(payload) else { return }
             clock.ingestPong(t0: pong.t0, t1: pong.t1, t2: pong.t2)
             pongsSeen += 1
-            if pongsSeen % 30 == 0 {
+            if pongsSeen >= 20 || pongsSeen % 5 == 0 {   // 1/s steady state; sparse during the burst
                 let d = clock.diagnostics
-                log.debug("sync offset=\(d.offsetMs, format: .fixed(precision: 3))ms minRTT=\(d.minRttMs, format: .fixed(precision: 3))ms converged=\(d.converged) buffered=\(self.playback.bufferedMs)ms")
+                let snapshot = StreamDiagnostics(
+                    offsetMs: d.offsetMs,
+                    minRttMs: d.minRttMs,
+                    clockConverged: d.converged,
+                    playback: playback.snapshotDiagnostics()
+                )
+                let p = snapshot.playback
+                log.debug("sync offset=\(d.offsetMs, format: .fixed(precision: 3))ms minRTT=\(d.minRttMs, format: .fixed(precision: 3))ms converged=\(d.converged) peak=\(p.renderPeak, format: .fixed(precision: 3)) buffered=\(p.bufferedMs)ms err=\(p.servoErrorMs, format: .fixed(precision: 2))ms late=\(p.lateDrops) under=\(p.underrunCycles) jumps=\(p.jumpCount)")
+                DispatchQueue.main.async { [onDiagnostics] in onDiagnostics?(snapshot) }
             }
         case .setVolume:
             guard let msg = try? WireProtocol.decodeJSON(SetVolumeMessage.self, from: payload) else { return }

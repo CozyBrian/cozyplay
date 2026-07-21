@@ -10,6 +10,7 @@
 		0E5665644590D0BEAD942112 /* PCMConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6FFF911E5F508E8B232015 /* PCMConverter.swift */; };
 		17C8617125682AAE4C5ABD1E /* TimelineRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A2C098890FA75F28A5B051 /* TimelineRingBuffer.swift */; };
 		1B8C2C5ECEC2216B46119ED4 /* HostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD017D40A1DE2CB0077113F5 /* HostController.swift */; };
+		1DB68296FC68B047081AD129 /* TimelinePlacerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942D6414F2BDDC832428544C /* TimelinePlacerTests.swift */; };
 		2A4DA4362463760465C353CB /* BonjourBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342F65005282E4810965CCAB /* BonjourBrowser.swift */; };
 		2A9EA00F6AC09DD67B58D31E /* HostIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0F502BCA0E9BE9AFF82A7F /* HostIdentity.swift */; };
 		35C82F8DE9BBB7238E7D3AB6 /* TimelineRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A2C098890FA75F28A5B051 /* TimelineRingBuffer.swift */; };
@@ -31,6 +32,7 @@
 		88E35DB661F91735A7275461 /* HostIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0F502BCA0E9BE9AFF82A7F /* HostIdentity.swift */; };
 		89FACB97E929617DAD7CBA16 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6026B661C662AFCF34F9314B /* Speaker.swift */; };
 		8C63558738154142082352E5 /* AudioServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E48DE535FFCCB1E10DE439 /* AudioServer.swift */; };
+		8FD8D8331A4920DC94FF13CB /* TimelinePlacer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7D0CC2669EC63E25C0C /* TimelinePlacer.swift */; };
 		94F14E4E45D478E5EED35AA1 /* Party.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1492F8A6403FE099E38F3CD /* Party.swift */; };
 		9B2949A3A6833D5757E84A32 /* HostClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C0BA465C461BD7E3703A87 /* HostClock.swift */; };
 		9B3A5D56348811107DB50A58 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2046BA0B94357FBFCC77411 /* AppState.swift */; };
@@ -47,6 +49,7 @@
 		E4FBE817F4D52F7BCC5A4EB7 /* SyncClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0611C6D2A6A29AA50F2B4A8 /* SyncClock.swift */; };
 		EA5290966675CE85129F1001 /* PlaybackEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87313636070F8F8E1D5D0EAC /* PlaybackEngine.swift */; };
 		EAA7C4488FC25DDCDE194FF2 /* ChunkAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB6E6BFF1D9D750FB5976BFB /* ChunkAssembler.swift */; };
+		ECC88E956FA8645B1CB3EC78 /* TimelinePlacer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7D0CC2669EC63E25C0C /* TimelinePlacer.swift */; };
 		ECCAB128F32062CE81B7949C /* WireProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */; };
 		F3EF16B58A942C6594F0149B /* AudioMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEB761FD235CD38481075ED /* AudioMeter.swift */; };
 		F4BEAE877907F7B8DC0A377E /* AudioServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E48DE535FFCCB1E10DE439 /* AudioServer.swift */; };
@@ -66,11 +69,13 @@
 		342F65005282E4810965CCAB /* BonjourBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourBrowser.swift; sourceTree = "<group>"; };
 		39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WireProtocol.swift; sourceTree = "<group>"; };
 		4B5930375862508EC41DC024 /* HostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostView.swift; sourceTree = "<group>"; };
+		5E2EF7D0CC2669EC63E25C0C /* TimelinePlacer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePlacer.swift; sourceTree = "<group>"; };
 		5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTileView.swift; sourceTree = "<group>"; };
 		6026B661C662AFCF34F9314B /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
 		7EE023D04D0173850C9E4125 /* JoinController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinController.swift; sourceTree = "<group>"; };
 		87313636070F8F8E1D5D0EAC /* PlaybackEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackEngine.swift; sourceTree = "<group>"; };
 		8B733E26D6177784E5398556 /* cozyplayTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cozyplayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		942D6414F2BDDC832428544C /* TimelinePlacerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePlacerTests.swift; sourceTree = "<group>"; };
 		A1492F8A6403FE099E38F3CD /* Party.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Party.swift; sourceTree = "<group>"; };
 		A4E48DE535FFCCB1E10DE439 /* AudioServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServer.swift; sourceTree = "<group>"; };
 		BB6E6BFF1D9D750FB5976BFB /* ChunkAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkAssembler.swift; sourceTree = "<group>"; };
@@ -94,6 +99,7 @@
 			children = (
 				214E3C41F76734E74B21C19B /* EngineBufferTests.swift */,
 				FF90D635D2718C66F3F46450 /* SyncClockTests.swift */,
+				942D6414F2BDDC832428544C /* TimelinePlacerTests.swift */,
 				DA0886F7096FFCDA4CBD717C /* WireProtocolTests.swift */,
 			);
 			path = Tests;
@@ -161,6 +167,7 @@
 				BF4EDDA666710D4B283094A7 /* RTAtomics.h */,
 				270AA8BAE2EE8A74E1898FDF /* StreamClient.swift */,
 				F0611C6D2A6A29AA50F2B4A8 /* SyncClock.swift */,
+				5E2EF7D0CC2669EC63E25C0C /* TimelinePlacer.swift */,
 				D2A2C098890FA75F28A5B051 /* TimelineRingBuffer.swift */,
 				39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */,
 			);
@@ -304,6 +311,7 @@
 				74E6439D4DAB9BFBA3AA5B39 /* StreamClient.swift in Sources */,
 				E47A8FF708963174AED7E444 /* SyncClock.swift in Sources */,
 				9FA1ED3FEF3AE0315DE9C70F /* SystemAudioTap.swift in Sources */,
+				8FD8D8331A4920DC94FF13CB /* TimelinePlacer.swift in Sources */,
 				35C82F8DE9BBB7238E7D3AB6 /* TimelineRingBuffer.swift in Sources */,
 				59E3758AF7123ED13C069FEA /* WireProtocol.swift in Sources */,
 				4CE4C17FDE82179F17D3AACD /* cozyplayApp.swift in Sources */,
@@ -331,6 +339,8 @@
 				E4FBE817F4D52F7BCC5A4EB7 /* SyncClock.swift in Sources */,
 				C858253370A52F8B2634E490 /* SyncClockTests.swift in Sources */,
 				3C71C63C1D9670B38A1B40F1 /* SystemAudioTap.swift in Sources */,
+				ECC88E956FA8645B1CB3EC78 /* TimelinePlacer.swift in Sources */,
+				1DB68296FC68B047081AD129 /* TimelinePlacerTests.swift in Sources */,
 				17C8617125682AAE4C5ABD1E /* TimelineRingBuffer.swift in Sources */,
 				ECCAB128F32062CE81B7949C /* WireProtocol.swift in Sources */,
 				D22D22E4762035D9963F95A0 /* WireProtocolTests.swift in Sources */,
@@ -364,13 +374,12 @@
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = CozyPlay;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = dev.cozybrian.cozyplay;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplay;
 				PRODUCT_NAME = cozyplay;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
@@ -509,13 +518,12 @@
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = CozyPlay;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = dev.cozybrian.cozyplay;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplay;
 				PRODUCT_NAME = cozyplay;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
