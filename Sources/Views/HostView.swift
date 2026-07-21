@@ -4,6 +4,8 @@ import SwiftUI
 struct HostView: View {
     @EnvironmentObject private var appState: AppState
     @ObservedObject var controller: HostController
+    @AppStorage(AppSettings.showDiagnosticsKey) private var showDiagnostics = false
+    @State private var showingPartySettings = false
 
     private let columns = [GridItem(.adaptive(minimum: 200), spacing: 16)]
 
@@ -23,6 +25,15 @@ struct HostView: View {
             }
             Spacer()
             NowPlayingMeter(level: controller.level, active: controller.isCapturing)
+            Button {
+                showingPartySettings.toggle()
+            } label: {
+                Image(systemName: "gearshape")
+            }
+            .help("Party settings")
+            .popover(isPresented: $showingPartySettings, arrowEdge: .bottom) {
+                PartySettingsPopover(controller: controller)
+            }
             Button(role: .destructive) { appState.backToPicker() } label: {
                 Label("End party", systemImage: "stop.circle")
             }
@@ -44,6 +55,10 @@ struct HostView: View {
                     }
                 }
                 .padding()
+            }
+            if showDiagnostics, let diagnostics = controller.diagnostics {
+                HostDiagnosticsPanel(diagnostics: diagnostics)
+                    .padding([.horizontal, .bottom])
             }
         }
     }
@@ -69,6 +84,35 @@ struct HostView: View {
         .padding()
         .background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
         .padding([.horizontal, .top])
+    }
+}
+
+/// Live party settings (gear popover on the host).
+private struct PartySettingsPopover: View {
+    @ObservedObject var controller: HostController
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Playback delay").font(.headline)
+            HStack {
+                Slider(
+                    value: Binding(
+                        get: { Double(controller.bufferMs) },
+                        set: { controller.setBuffer(ms: Int($0 / 10) * 10) }
+                    ),
+                    in: Double(EngineConstants.minBufferMs)...Double(EngineConstants.maxBufferMs)
+                )
+                .frame(width: 220)
+                Text("\(controller.bufferMs) ms")
+                    .font(.body.monospacedDigit())
+                    .frame(width: 56, alignment: .trailing)
+            }
+            Text("Applies immediately to every speaker. Raise it if audio drops out on busy Wi-Fi; lower it for tighter video sync.")
+                .font(.caption).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(16)
+        .frame(width: 320)
     }
 }
 

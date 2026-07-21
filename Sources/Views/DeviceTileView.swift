@@ -45,6 +45,26 @@ struct DeviceTileView: View {
                     .font(.caption.monospacedDigit())
                     .frame(width: 28, alignment: .trailing)
             }
+
+            HStack(spacing: 6) {
+                Text("Sync trim")
+                    .font(.caption).foregroundStyle(.secondary)
+                Spacer()
+                Text("\(speaker.latencyMs) ms")
+                    .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                Stepper(
+                    "",
+                    value: Binding(
+                        get: { speaker.latencyMs },
+                        set: { controller.setLatency(speaker, ms: $0) }
+                    ),
+                    in: -100...100,
+                    step: 5
+                )
+                .labelsHidden()
+                .controlSize(.small)
+                .help("Nudge this speaker earlier (+) or later (−) if it sounds slightly off from the rest.")
+            }
         }
         .padding(16)
         .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 14))

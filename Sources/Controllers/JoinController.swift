@@ -10,6 +10,7 @@ final class JoinController: ObservableObject {
     @Published var connectedParty: Party?
     @Published var statusText = "Looking for parties…"
     @Published var errorText: String?
+    @Published var diagnostics: StreamClient.StreamDiagnostics?
 
     private let browser = BonjourBrowser()
     private var client: StreamClient?
@@ -53,6 +54,9 @@ final class JoinController: ObservableObject {
                 self.statusText = self.parties.isEmpty ? "Looking for parties…" : "Found \(self.parties.count)"
             }
         }
+        client.onDiagnostics = { [weak self] snapshot in
+            self?.diagnostics = snapshot
+        }
         client.connect()
         self.client = client
         connectedParty = party
@@ -63,6 +67,7 @@ final class JoinController: ObservableObject {
         client?.disconnect()
         client = nil
         connectedParty = nil
+        diagnostics = nil
         statusText = parties.isEmpty ? "Looking for parties…" : "Found \(parties.count)"
     }
 
@@ -72,5 +77,5 @@ final class JoinController: ObservableObject {
         client = nil
     }
 
-    private func deviceName() -> String { Host.current().localizedName ?? "MacBook" }
+    private func deviceName() -> String { AppSettings.deviceName() }
 }

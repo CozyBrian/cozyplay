@@ -21,8 +21,10 @@
 		4147DD012E9C52E629A63ADD /* PCMConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6FFF911E5F508E8B232015 /* PCMConverter.swift */; };
 		4CE4C17FDE82179F17D3AACD /* cozyplayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A40F1F0C474B8D84913A6B4 /* cozyplayApp.swift */; };
 		4ECF5499D748709E31D15D4C /* DeviceTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */; };
+		55EC09F57BF939408F769BA5 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB06945DDB8C014E5F35922 /* AppSettings.swift */; };
 		59E3758AF7123ED13C069FEA /* WireProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */; };
 		5E17CD5B89B369A7A82062F4 /* PlaybackEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87313636070F8F8E1D5D0EAC /* PlaybackEngine.swift */; };
+		6D939752599C5A900E921C8A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541B42AC68F1A0FEBD0ECC53 /* SettingsView.swift */; };
 		71207BDFFCECAAE68DCE9EDC /* StreamClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270AA8BAE2EE8A74E1898FDF /* StreamClient.swift */; };
 		743CCF58A72A94C9DAEA64C2 /* ClockSyncSpike.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0555B1D52820CEEB9B3F832C /* ClockSyncSpike.swift */; };
 		74E6439D4DAB9BFBA3AA5B39 /* StreamClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270AA8BAE2EE8A74E1898FDF /* StreamClient.swift */; };
@@ -69,6 +71,7 @@
 		342F65005282E4810965CCAB /* BonjourBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourBrowser.swift; sourceTree = "<group>"; };
 		39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WireProtocol.swift; sourceTree = "<group>"; };
 		4B5930375862508EC41DC024 /* HostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostView.swift; sourceTree = "<group>"; };
+		541B42AC68F1A0FEBD0ECC53 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5E2EF7D0CC2669EC63E25C0C /* TimelinePlacer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePlacer.swift; sourceTree = "<group>"; };
 		5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTileView.swift; sourceTree = "<group>"; };
 		6026B661C662AFCF34F9314B /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
@@ -90,6 +93,7 @@
 		D92121F282E73398A9BB9DCA /* JoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinView.swift; sourceTree = "<group>"; };
 		DA0886F7096FFCDA4CBD717C /* WireProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WireProtocolTests.swift; sourceTree = "<group>"; };
 		F0611C6D2A6A29AA50F2B4A8 /* SyncClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncClock.swift; sourceTree = "<group>"; };
+		FCB06945DDB8C014E5F35922 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		FF90D635D2718C66F3F46450 /* SyncClockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncClockTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -186,6 +190,7 @@
 		58D01A7C50EE015B96DBA1A1 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				FCB06945DDB8C014E5F35922 /* AppSettings.swift */,
 				C2046BA0B94357FBFCC77411 /* AppState.swift */,
 				0A40F1F0C474B8D84913A6B4 /* cozyplayApp.swift */,
 			);
@@ -209,6 +214,7 @@
 				4B5930375862508EC41DC024 /* HostView.swift */,
 				D92121F282E73398A9BB9DCA /* JoinView.swift */,
 				2740C24DEDF110C83A967D83 /* RolePickerView.swift */,
+				541B42AC68F1A0FEBD0ECC53 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -289,6 +295,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55EC09F57BF939408F769BA5 /* AppSettings.swift in Sources */,
 				9B3A5D56348811107DB50A58 /* AppState.swift in Sources */,
 				4010DF0B6C0E64CAE961F295 /* AudioMeter.swift in Sources */,
 				F4BEAE877907F7B8DC0A377E /* AudioServer.swift in Sources */,
@@ -307,6 +314,7 @@
 				F8D12240D24DCB4FADFB5D5D /* Party.swift in Sources */,
 				5E17CD5B89B369A7A82062F4 /* PlaybackEngine.swift in Sources */,
 				9E4497EDA2768F7CF1AB2A62 /* RolePickerView.swift in Sources */,
+				6D939752599C5A900E921C8A /* SettingsView.swift in Sources */,
 				89FACB97E929617DAD7CBA16 /* Speaker.swift in Sources */,
 				74E6439D4DAB9BFBA3AA5B39 /* StreamClient.swift in Sources */,
 				E47A8FF708963174AED7E444 /* SyncClock.swift in Sources */,

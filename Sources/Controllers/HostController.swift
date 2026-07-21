@@ -12,6 +12,8 @@ final class HostController: ObservableObject {
     @Published var errorText: String?
     @Published var level: Float = 0
     @Published var isCapturing = false
+    @Published var bufferMs = AppSettings.defaultBufferMs
+    @Published var diagnostics: AudioServer.HostDiagnostics?
 
     let partyName: String
 
@@ -39,7 +41,8 @@ final class HostController: ObservableObject {
         let engine = AudioServer(
             partyName: partyName,
             localName: deviceName(),
-            localHostID: localHostID
+            localHostID: localHostID,
+            bufferMs: bufferMs
         )
         engine.onSpeakers = { [weak self] speakers in
             guard let self else { return }
@@ -57,6 +60,12 @@ final class HostController: ObservableObject {
             self?.errorText = message
             self?.statusText = "Party engine not fully started"
         }
+        engine.onLocalPlaybackIssue = { [weak self] message in
+            self?.errorText = message   // nil clears a recovered issue
+        }
+        engine.onDiagnostics = { [weak self] snapshot in
+            self?.diagnostics = snapshot
+        }
         do {
             try engine.start()
             self.engine = engine
@@ -68,7 +77,7 @@ final class HostController: ObservableObject {
 
     private func startCapture() {
         do {
-            try tap.start { [weak self] buffer, hostTimeNs in
+            try tap.start(keepSourceAudible: AppSettings.keepSourceAudible) { [weak self] buffer, hostTimeNs in
                 guard let self else { return }
                 self.meter.process(buffer)
                 if self.converter == nil, let fmt = self.tap.format {
@@ -102,11 +111,19 @@ final class HostController: ObservableObject {
         engine?.setLatency(clientID: speaker.id, latencyMs: ms)
     }
 
+    /// Live party-wide delay change; also becomes the default for new parties.
+    func setBuffer(ms: Int) {
+        let clamped = max(EngineConstants.minBufferMs, min(EngineConstants.maxBufferMs, ms))
+        bufferMs = clamped
+        AppSettings.defaultBufferMs = clamped
+        engine?.setBuffer(ms: clamped)
+    }
+
     func stop() {
         tap.stop()
         engine?.stop()
         engine = nil
     }
 
-    private func deviceName() -> String { Host.current().localizedName ?? "MacBook" }
+    private func deviceName() -> String { AppSettings.deviceName() }
 }

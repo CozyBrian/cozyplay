@@ -4,6 +4,7 @@ import SwiftUI
 struct JoinView: View {
     @EnvironmentObject private var appState: AppState
     @ObservedObject var controller: JoinController
+    @AppStorage(AppSettings.showDiagnosticsKey) private var showDiagnostics = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -73,6 +74,10 @@ struct JoinView: View {
             }
             .controlSize(.large)
             .padding(.top, 8)
+            if showDiagnostics, let diagnostics = controller.diagnostics {
+                StreamDiagnosticsPanel(diagnostics: diagnostics)
+                    .padding(.top, 12)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
