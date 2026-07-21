@@ -4,6 +4,12 @@ import SwiftUI
 struct cozyplayApp: App {
     @StateObject private var appState = AppState()
 
+    init() {
+        #if DEBUG
+        ClockSyncSpike.startIfRequested()
+        #endif
+    }
+
     var body: some Scene {
         WindowGroup {
             RootView()

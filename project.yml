@@ -31,3 +31,29 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         LD_RUNPATH_SEARCH_PATHS:
           - "@executable_path/../Frameworks"
+
+  # Logic tests: compiles the engine/audio/model sources directly (no app host,
+  # so tests run headless without launching UI or triggering TCC prompts).
+  cozyplayTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+      - path: Sources
+        excludes:
+          - "App/**"
+          - "Views/**"
+          - "Controllers/**"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: africa.inpathgroup.cozyplayTests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  cozyplay:
+    build:
+      targets:
+        cozyplay: all
+    test:
+      targets:
+        - cozyplayTests
