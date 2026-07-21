@@ -38,15 +38,23 @@ final class SystemAudioTap {
     private var ioProcID: AudioDeviceIOProcID?
     private let ioQueue = DispatchQueue(label: "africa.inpathgroup.cozyplay.tap")
 
-    /// Delivered on the audio IO queue for every captured buffer.
-    private var onBuffer: ((AVAudioPCMBuffer) -> Void)?
+    /// Delivered on the audio IO queue for every captured buffer, along with the
+    /// capture host time of the buffer's first frame in nanoseconds
+    /// (`AudioTimeStamp.mHostTime` converted via `HostClock`).
+    private var onBuffer: ((AVAudioPCMBuffer, UInt64) -> Void)?
 
     /// Start capturing. `onBuffer` is called for each captured chunk.
-    func start(onBuffer: @escaping (AVAudioPCMBuffer) -> Void) throws {
+    func start(onBuffer: @escaping (AVAudioPCMBuffer, UInt64) -> Void) throws {
         self.onBuffer = onBuffer
 
-        // 1. Describe a stereo tap of the whole system (exclude nothing).
-        let description = CATapDescription(stereoGlobalTapButExcludeProcesses: [])
+        // 1. Describe a stereo tap of the whole system, excluding our own process —
+        //    otherwise the engine's delayed local playback would be re-captured as a
+        //    feedback/echo loop.
+        var excluded: [AudioObjectID] = []
+        if let selfObject = Self.processObject(forPID: ProcessInfo.processInfo.processIdentifier) {
+            excluded.append(selfObject)
+        }
+        let description = CATapDescription(stereoGlobalTapButExcludeProcesses: excluded)
         description.uuid = UUID()
         description.name = "cozyplay-tap"
         description.isPrivate = true
@@ -94,10 +102,13 @@ final class SystemAudioTap {
 
         // 5. Install and start an IOProc on the aggregate device.
         let ioStatus = AudioDeviceCreateIOProcIDWithBlock(&ioProcID, aggregateID, ioQueue) {
-            [weak self] _, inInputData, _, _, _ in
+            [weak self] _, inInputData, inInputTime, _, _ in
             guard let self, let format = self.format else { return }
+            let ticks = inInputTime.pointee.mFlags.contains(.hostTimeValid)
+                ? inInputTime.pointee.mHostTime
+                : mach_absolute_time()
             if let buffer = AVAudioPCMBuffer(pcmFormat: format, bufferListNoCopy: inInputData, deallocator: nil) {
-                self.onBuffer?(buffer)
+                self.onBuffer?(buffer, HostClock.ns(fromHostTicks: ticks))
             }
         }
         guard ioStatus == noErr else { throw TapError.ioProcFailed(ioStatus) }
@@ -123,6 +134,26 @@ final class SystemAudioTap {
     }
 
     // MARK: Helpers
+
+    /// Translate a Unix PID to its Core Audio process object (for tap exclusion).
+    private static func processObject(forPID pid: pid_t) -> AudioObjectID? {
+        var pidValue = pid
+        var objectID = AudioObjectID(kAudioObjectUnknown)
+        var size = UInt32(MemoryLayout<AudioObjectID>.size)
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyTranslatePIDToProcessObject,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        let status = withUnsafeMutablePointer(to: &pidValue) { pidPtr in
+            AudioObjectGetPropertyData(
+                AudioObjectID(kAudioObjectSystemObject), &address,
+                UInt32(MemoryLayout<pid_t>.size), pidPtr, &size, &objectID
+            )
+        }
+        guard status == noErr, objectID != kAudioObjectUnknown else { return nil }
+        return objectID
+    }
 
     private static func defaultOutputDeviceUID() -> String? {
         var deviceID = AudioObjectID(kAudioObjectUnknown)

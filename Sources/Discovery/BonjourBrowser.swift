@@ -59,7 +59,7 @@ final class BonjourBrowser {
             if case .ready = state,
                let remote = conn.currentPath?.remoteEndpoint,
                case let .hostPort(host, _) = remote {
-                self.parties[name] = Party(name: name, host: Self.hostString(host))
+                self.parties[name] = Party(name: name, host: Self.hostString(host), endpoint: endpoint)
                 self.emit()
                 conn.cancel()
                 self.resolvers[name] = nil

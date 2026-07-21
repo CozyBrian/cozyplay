@@ -8,9 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		0E5665644590D0BEAD942112 /* PCMConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6FFF911E5F508E8B232015 /* PCMConverter.swift */; };
+		17C8617125682AAE4C5ABD1E /* TimelineRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A2C098890FA75F28A5B051 /* TimelineRingBuffer.swift */; };
 		1B8C2C5ECEC2216B46119ED4 /* HostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD017D40A1DE2CB0077113F5 /* HostController.swift */; };
 		2A4DA4362463760465C353CB /* BonjourBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342F65005282E4810965CCAB /* BonjourBrowser.swift */; };
 		2A9EA00F6AC09DD67B58D31E /* HostIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0F502BCA0E9BE9AFF82A7F /* HostIdentity.swift */; };
+		35C82F8DE9BBB7238E7D3AB6 /* TimelineRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A2C098890FA75F28A5B051 /* TimelineRingBuffer.swift */; };
+		39DDA62B4E90F7A8983D9FEE /* ChunkAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB6E6BFF1D9D750FB5976BFB /* ChunkAssembler.swift */; };
 		3C71C63C1D9670B38A1B40F1 /* SystemAudioTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A880051C3838137B3AC49A /* SystemAudioTap.swift */; };
 		4010DF0B6C0E64CAE961F295 /* AudioMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEB761FD235CD38481075ED /* AudioMeter.swift */; };
 		402425ADF77FB630A8B1EF66 /* EngineConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D1B1F14D823222FAC2418E /* EngineConstants.swift */; };
@@ -18,12 +21,16 @@
 		4CE4C17FDE82179F17D3AACD /* cozyplayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A40F1F0C474B8D84913A6B4 /* cozyplayApp.swift */; };
 		4ECF5499D748709E31D15D4C /* DeviceTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */; };
 		59E3758AF7123ED13C069FEA /* WireProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */; };
+		5E17CD5B89B369A7A82062F4 /* PlaybackEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87313636070F8F8E1D5D0EAC /* PlaybackEngine.swift */; };
+		71207BDFFCECAAE68DCE9EDC /* StreamClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270AA8BAE2EE8A74E1898FDF /* StreamClient.swift */; };
 		743CCF58A72A94C9DAEA64C2 /* ClockSyncSpike.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0555B1D52820CEEB9B3F832C /* ClockSyncSpike.swift */; };
+		74E6439D4DAB9BFBA3AA5B39 /* StreamClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270AA8BAE2EE8A74E1898FDF /* StreamClient.swift */; };
 		79B322889F654897945948B4 /* HostClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C0BA465C461BD7E3703A87 /* HostClock.swift */; };
 		7CCF92DC1DA8CF17ABBB3955 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6026B661C662AFCF34F9314B /* Speaker.swift */; };
 		87C24DE5E1220C685CFEDD25 /* ClockSyncSpike.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0555B1D52820CEEB9B3F832C /* ClockSyncSpike.swift */; };
 		88E35DB661F91735A7275461 /* HostIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0F502BCA0E9BE9AFF82A7F /* HostIdentity.swift */; };
 		89FACB97E929617DAD7CBA16 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6026B661C662AFCF34F9314B /* Speaker.swift */; };
+		8C63558738154142082352E5 /* AudioServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E48DE535FFCCB1E10DE439 /* AudioServer.swift */; };
 		94F14E4E45D478E5EED35AA1 /* Party.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1492F8A6403FE099E38F3CD /* Party.swift */; };
 		9B2949A3A6833D5757E84A32 /* HostClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C0BA465C461BD7E3703A87 /* HostClock.swift */; };
 		9B3A5D56348811107DB50A58 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2046BA0B94357FBFCC77411 /* AppState.swift */; };
@@ -38,9 +45,13 @@
 		DD926FCC5C69BE9ED7BA2F6B /* HostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5930375862508EC41DC024 /* HostView.swift */; };
 		E47A8FF708963174AED7E444 /* SyncClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0611C6D2A6A29AA50F2B4A8 /* SyncClock.swift */; };
 		E4FBE817F4D52F7BCC5A4EB7 /* SyncClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0611C6D2A6A29AA50F2B4A8 /* SyncClock.swift */; };
+		EA5290966675CE85129F1001 /* PlaybackEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87313636070F8F8E1D5D0EAC /* PlaybackEngine.swift */; };
+		EAA7C4488FC25DDCDE194FF2 /* ChunkAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB6E6BFF1D9D750FB5976BFB /* ChunkAssembler.swift */; };
 		ECCAB128F32062CE81B7949C /* WireProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */; };
 		F3EF16B58A942C6594F0149B /* AudioMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEB761FD235CD38481075ED /* AudioMeter.swift */; };
+		F4BEAE877907F7B8DC0A377E /* AudioServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E48DE535FFCCB1E10DE439 /* AudioServer.swift */; };
 		F8D12240D24DCB4FADFB5D5D /* Party.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1492F8A6403FE099E38F3CD /* Party.swift */; };
+		FF47A9E95932D0ED37E1C806 /* EngineBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 214E3C41F76734E74B21C19B /* EngineBufferTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +60,8 @@
 		0B6FFF911E5F508E8B232015 /* PCMConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCMConverter.swift; sourceTree = "<group>"; };
 		11D1B1F14D823222FAC2418E /* EngineConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineConstants.swift; sourceTree = "<group>"; };
 		1B0F502BCA0E9BE9AFF82A7F /* HostIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostIdentity.swift; sourceTree = "<group>"; };
+		214E3C41F76734E74B21C19B /* EngineBufferTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineBufferTests.swift; sourceTree = "<group>"; };
+		270AA8BAE2EE8A74E1898FDF /* StreamClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamClient.swift; sourceTree = "<group>"; };
 		2740C24DEDF110C83A967D83 /* RolePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RolePickerView.swift; sourceTree = "<group>"; };
 		342F65005282E4810965CCAB /* BonjourBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourBrowser.swift; sourceTree = "<group>"; };
 		39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WireProtocol.swift; sourceTree = "<group>"; };
@@ -56,12 +69,17 @@
 		5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTileView.swift; sourceTree = "<group>"; };
 		6026B661C662AFCF34F9314B /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
 		7EE023D04D0173850C9E4125 /* JoinController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinController.swift; sourceTree = "<group>"; };
+		87313636070F8F8E1D5D0EAC /* PlaybackEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackEngine.swift; sourceTree = "<group>"; };
 		8B733E26D6177784E5398556 /* cozyplayTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cozyplayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1492F8A6403FE099E38F3CD /* Party.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Party.swift; sourceTree = "<group>"; };
+		A4E48DE535FFCCB1E10DE439 /* AudioServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServer.swift; sourceTree = "<group>"; };
+		BB6E6BFF1D9D750FB5976BFB /* ChunkAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkAssembler.swift; sourceTree = "<group>"; };
+		BF4EDDA666710D4B283094A7 /* RTAtomics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RTAtomics.h; sourceTree = "<group>"; };
 		C2046BA0B94357FBFCC77411 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		C3C0BA465C461BD7E3703A87 /* HostClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostClock.swift; sourceTree = "<group>"; };
 		CD017D40A1DE2CB0077113F5 /* HostController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostController.swift; sourceTree = "<group>"; };
 		CFEB761FD235CD38481075ED /* AudioMeter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMeter.swift; sourceTree = "<group>"; };
+		D2A2C098890FA75F28A5B051 /* TimelineRingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineRingBuffer.swift; sourceTree = "<group>"; };
 		D2A880051C3838137B3AC49A /* SystemAudioTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAudioTap.swift; sourceTree = "<group>"; };
 		D47E52339D9060A4C233BB27 /* cozyplay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cozyplay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D92121F282E73398A9BB9DCA /* JoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinView.swift; sourceTree = "<group>"; };
@@ -74,6 +92,7 @@
 		0BED9793B52BD19F70B0CD76 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				214E3C41F76734E74B21C19B /* EngineBufferTests.swift */,
 				FF90D635D2718C66F3F46450 /* SyncClockTests.swift */,
 				DA0886F7096FFCDA4CBD717C /* WireProtocolTests.swift */,
 			);
@@ -132,11 +151,17 @@
 		36F6123795D9ADCB1E552FCE /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				A4E48DE535FFCCB1E10DE439 /* AudioServer.swift */,
+				BB6E6BFF1D9D750FB5976BFB /* ChunkAssembler.swift */,
 				0555B1D52820CEEB9B3F832C /* ClockSyncSpike.swift */,
 				11D1B1F14D823222FAC2418E /* EngineConstants.swift */,
 				C3C0BA465C461BD7E3703A87 /* HostClock.swift */,
 				1B0F502BCA0E9BE9AFF82A7F /* HostIdentity.swift */,
+				87313636070F8F8E1D5D0EAC /* PlaybackEngine.swift */,
+				BF4EDDA666710D4B283094A7 /* RTAtomics.h */,
+				270AA8BAE2EE8A74E1898FDF /* StreamClient.swift */,
 				F0611C6D2A6A29AA50F2B4A8 /* SyncClock.swift */,
+				D2A2C098890FA75F28A5B051 /* TimelineRingBuffer.swift */,
 				39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */,
 			);
 			path = Engine;
@@ -259,7 +284,9 @@
 			files = (
 				9B3A5D56348811107DB50A58 /* AppState.swift in Sources */,
 				4010DF0B6C0E64CAE961F295 /* AudioMeter.swift in Sources */,
+				F4BEAE877907F7B8DC0A377E /* AudioServer.swift in Sources */,
 				D977DF77E3845348F46F027E /* BonjourBrowser.swift in Sources */,
+				39DDA62B4E90F7A8983D9FEE /* ChunkAssembler.swift in Sources */,
 				87C24DE5E1220C685CFEDD25 /* ClockSyncSpike.swift in Sources */,
 				4ECF5499D748709E31D15D4C /* DeviceTileView.swift in Sources */,
 				402425ADF77FB630A8B1EF66 /* EngineConstants.swift in Sources */,
@@ -271,10 +298,13 @@
 				AFE327447E4F96C3C1200018 /* JoinView.swift in Sources */,
 				0E5665644590D0BEAD942112 /* PCMConverter.swift in Sources */,
 				F8D12240D24DCB4FADFB5D5D /* Party.swift in Sources */,
+				5E17CD5B89B369A7A82062F4 /* PlaybackEngine.swift in Sources */,
 				9E4497EDA2768F7CF1AB2A62 /* RolePickerView.swift in Sources */,
 				89FACB97E929617DAD7CBA16 /* Speaker.swift in Sources */,
+				74E6439D4DAB9BFBA3AA5B39 /* StreamClient.swift in Sources */,
 				E47A8FF708963174AED7E444 /* SyncClock.swift in Sources */,
 				9FA1ED3FEF3AE0315DE9C70F /* SystemAudioTap.swift in Sources */,
+				35C82F8DE9BBB7238E7D3AB6 /* TimelineRingBuffer.swift in Sources */,
 				59E3758AF7123ED13C069FEA /* WireProtocol.swift in Sources */,
 				4CE4C17FDE82179F17D3AACD /* cozyplayApp.swift in Sources */,
 			);
@@ -285,17 +315,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				F3EF16B58A942C6594F0149B /* AudioMeter.swift in Sources */,
+				8C63558738154142082352E5 /* AudioServer.swift in Sources */,
 				2A4DA4362463760465C353CB /* BonjourBrowser.swift in Sources */,
+				EAA7C4488FC25DDCDE194FF2 /* ChunkAssembler.swift in Sources */,
 				743CCF58A72A94C9DAEA64C2 /* ClockSyncSpike.swift in Sources */,
+				FF47A9E95932D0ED37E1C806 /* EngineBufferTests.swift in Sources */,
 				B883A7FE96CA8F4C8D866865 /* EngineConstants.swift in Sources */,
 				9B2949A3A6833D5757E84A32 /* HostClock.swift in Sources */,
 				88E35DB661F91735A7275461 /* HostIdentity.swift in Sources */,
 				4147DD012E9C52E629A63ADD /* PCMConverter.swift in Sources */,
 				94F14E4E45D478E5EED35AA1 /* Party.swift in Sources */,
+				EA5290966675CE85129F1001 /* PlaybackEngine.swift in Sources */,
 				7CCF92DC1DA8CF17ABBB3955 /* Speaker.swift in Sources */,
+				71207BDFFCECAAE68DCE9EDC /* StreamClient.swift in Sources */,
 				E4FBE817F4D52F7BCC5A4EB7 /* SyncClock.swift in Sources */,
 				C858253370A52F8B2634E490 /* SyncClockTests.swift in Sources */,
 				3C71C63C1D9670B38A1B40F1 /* SystemAudioTap.swift in Sources */,
+				17C8617125682AAE4C5ABD1E /* TimelineRingBuffer.swift in Sources */,
 				ECCAB128F32062CE81B7949C /* WireProtocol.swift in Sources */,
 				D22D22E4762035D9963F95A0 /* WireProtocolTests.swift in Sources */,
 			);
@@ -317,6 +353,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplayTests;
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
 			};
 			name = Release;
 		};
@@ -335,6 +372,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplay;
 				PRODUCT_NAME = cozyplay;
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
 			};
 			name = Debug;
 		};
@@ -478,6 +516,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplay;
 				PRODUCT_NAME = cozyplay;
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
 			};
 			name = Release;
 		};
@@ -494,6 +533,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplayTests;
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = Sources/Engine/RTAtomics.h;
 			};
 			name = Debug;
 		};

@@ -29,6 +29,7 @@ targets:
         CODE_SIGN_ENTITLEMENTS: Support/cozyplay.entitlements
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: NO
+        SWIFT_OBJC_BRIDGING_HEADER: Sources/Engine/RTAtomics.h
         LD_RUNPATH_SEARCH_PATHS:
           - "@executable_path/../Frameworks"
 
@@ -48,6 +49,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: africa.inpathgroup.cozyplayTests
         GENERATE_INFOPLIST_FILE: YES
+        SWIFT_OBJC_BRIDGING_HEADER: Sources/Engine/RTAtomics.h
 
 schemes:
   cozyplay:

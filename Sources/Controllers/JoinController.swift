@@ -12,7 +12,7 @@ final class JoinController: ObservableObject {
     @Published var errorText: String?
 
     private let browser = BonjourBrowser()
-    // TODO(M-2): StreamClient — connect, clock sync, jitter buffer, playback.
+    private var client: StreamClient?
 
     func startBrowsing() {
         browser.onParties = { [weak self] parties in
@@ -29,19 +29,47 @@ final class JoinController: ObservableObject {
 
     func join(_ party: Party) {
         errorText = nil
-        // TODO(M-2): connect a StreamClient to party.host:party.port and surface
-        // its state changes here; until then joining is discovery-only.
+        client?.disconnect()
+
+        let client = StreamClient(
+            endpoint: party.endpoint,
+            hostID: HostIdentity.stableID(),
+            displayName: deviceName()
+        )
+        client.onState = { [weak self] state in
+            guard let self, self.connectedParty == party else { return }
+            switch state {
+            case .idle:
+                break
+            case .connecting, .waitingForWelcome:
+                self.statusText = "Connecting to “\(party.name)”…"
+            case .playing:
+                self.statusText = "Connected to “\(party.name)” — playing in sync"
+            case .reconnecting:
+                self.statusText = "Reconnecting to “\(party.name)”…"
+            case .ended(let reason):
+                self.errorText = reason
+                self.connectedParty = nil
+                self.statusText = self.parties.isEmpty ? "Looking for parties…" : "Found \(self.parties.count)"
+            }
+        }
+        client.connect()
+        self.client = client
         connectedParty = party
-        statusText = "Joined “\(party.name)” — native playback engine not built yet"
+        statusText = "Connecting to “\(party.name)”…"
     }
 
     func leave() {
+        client?.disconnect()
+        client = nil
         connectedParty = nil
         statusText = parties.isEmpty ? "Looking for parties…" : "Found \(parties.count)"
     }
 
     func stop() {
         browser.stop()
+        client?.disconnect()
+        client = nil
     }
 
     private func deviceName() -> String { Host.current().localizedName ?? "MacBook" }

@@ -18,9 +18,8 @@ final class HostController: ObservableObject {
     private let tap = SystemAudioTap()
     private let meter = AudioMeter()
     private var converter: PCMConverter?
+    private var engine: AudioServer?
     private let localHostID = HostIdentity.stableID()
-    // TODO(M-2): AudioServer — NWListener + Bonjour service, chunk fan-out,
-    // local playback injection, speaker roster authority.
 
     init(partyName: String) {
         self.partyName = partyName
@@ -33,29 +32,47 @@ final class HostController: ObservableObject {
     }
 
     private func startEngine() {
-        // Native engine lands in M-2; until then hosting is capture + local roster only.
-        speakers = [Speaker(
-            id: localHostID,
-            name: "\(deviceName()) (host)",
-            host: deviceName(),
-            volumePercent: 100,
-            isMuted: false,
-            latencyMs: 0,
-            isConnected: true,
-            isThisMac: true
-        )]
-        statusText = "Hosting “\(partyName)” — native engine not streaming yet"
+        let engine = AudioServer(
+            partyName: partyName,
+            localName: deviceName(),
+            localHostID: localHostID
+        )
+        engine.onSpeakers = { [weak self] speakers in
+            guard let self else { return }
+            self.speakers = speakers.map { speaker in
+                var s = speaker
+                s.isThisMac = (speaker.id == self.localHostID)
+                return s
+            }
+        }
+        engine.onReady = { [weak self] _ in
+            guard let self else { return }
+            self.statusText = "Hosting “\(self.partyName)” — waiting for laptops to join"
+        }
+        engine.onError = { [weak self] message in
+            self?.errorText = message
+            self?.statusText = "Party engine not fully started"
+        }
+        do {
+            try engine.start()
+            self.engine = engine
+        } catch {
+            errorText = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            statusText = "Party engine not fully started"
+        }
     }
 
     private func startCapture() {
         do {
-            try tap.start { [weak self] buffer in
+            try tap.start { [weak self] buffer, hostTimeNs in
                 guard let self else { return }
                 self.meter.process(buffer)
                 if self.converter == nil, let fmt = self.tap.format {
                     self.converter = PCMConverter(inputFormat: fmt)
                 }
-                // TODO(M-2): engine.ingest(converter output + capture hostTime)
+                if let data = self.converter?.convertToData(buffer) {
+                    self.engine?.ingest(data, firstFrameHostNs: hostTimeNs)
+                }
             }
             isCapturing = true
         } catch {
@@ -66,32 +83,25 @@ final class HostController: ObservableObject {
     // MARK: Speaker controls (proxied to the engine's roster authority)
 
     func setVolume(_ speaker: Speaker, percent: Int) {
-        // TODO(M-4): engine.setVolume(clientID:percent:muted:)
-        update(speaker.id) { $0.volumePercent = percent }
+        engine?.setVolume(clientID: speaker.id, percent: percent, muted: speaker.isMuted)
     }
 
     func setMuted(_ speaker: Speaker, muted: Bool) {
-        // TODO(M-4): engine.setVolume(clientID:percent:muted:)
-        update(speaker.id) { $0.isMuted = muted }
+        engine?.setVolume(clientID: speaker.id, percent: speaker.volumePercent, muted: muted)
     }
 
     func rename(_ speaker: Speaker, to name: String) {
-        // TODO(M-4): engine.setName(clientID:name:)
-        update(speaker.id) { $0.name = name }
+        engine?.setName(clientID: speaker.id, name: name)
     }
 
     func setLatency(_ speaker: Speaker, ms: Int) {
-        // TODO(M-4): engine.setLatency(clientID:latencyMs:)
-        update(speaker.id) { $0.latencyMs = ms }
+        engine?.setLatency(clientID: speaker.id, latencyMs: ms)
     }
 
     func stop() {
         tap.stop()
-    }
-
-    private func update(_ id: String, _ mutate: (inout Speaker) -> Void) {
-        guard let i = speakers.firstIndex(where: { $0.id == id }) else { return }
-        mutate(&speakers[i])
+        engine?.stop()
+        engine = nil
     }
 
     private func deviceName() -> String { Host.current().localizedName ?? "MacBook" }
