@@ -112,13 +112,30 @@ final class TimelineRingBufferTests: XCTestCase {
         XCTAssertEqual(out.left[959], 0.5, accuracy: 0.0001)
     }
 
-    func testReadZeroesConsumedRegion() {
+    func testReadDoesNotZeroButZeroDoes() {
         let ring = TimelineRingBuffer()
         ring.write(samplesS16: s16Frames(960, value: 16384), at: 0)
         _ = readFrames(ring, from: 0, count: 960)
+        // The fractional reader re-reads boundary frames, so read() must not zero.
         let second = readFrames(ring, from: 0, count: 960)
-        XCTAssertEqual(second.left[0], 0)
-        XCTAssertEqual(second.right[500], 0)
+        XCTAssertEqual(second.left[0], 0.5, accuracy: 0.0001)
+        // The consumed range is silenced explicitly.
+        ring.zero(from: 0, to: 960)
+        let third = readFrames(ring, from: 0, count: 960)
+        XCTAssertEqual(third.left[0], 0)
+        XCTAssertEqual(third.right[500], 0)
+    }
+
+    func testZeroWrapsAroundRingBoundary() {
+        let ring = TimelineRingBuffer()
+        let capacity = Int64(TimelineRingBuffer.capacityFrames)
+        let position = capacity - 100
+        ring.readPosition = position
+        ring.write(samplesS16: s16Frames(960, value: 8192), at: position)
+        ring.zero(from: position, to: position + 960)
+        let out = readFrames(ring, from: position, count: 960)
+        XCTAssertTrue(out.left.allSatisfy { $0 == 0 })
+        XCTAssertTrue(out.right.allSatisfy { $0 == 0 })
     }
 
     func testWrapAroundWriteAndRead() {

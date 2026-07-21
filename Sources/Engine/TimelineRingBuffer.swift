@@ -7,8 +7,10 @@ import Accelerate
 /// the anchor instant); the ring index is `position & mask`. The writer (net
 /// queue) converts S16LE chunks and writes them at their timeline position;
 /// the reader (audio render thread) copies frames out and **zeroes the region
-/// it consumed** — so data that never arrived renders as silence and playback
-/// self-heals with no state machine in the render path.
+/// it has fully consumed** (via `zero(from:to:)` — kept separate from `read`
+/// because the fractional-rate reader re-reads a couple of boundary frames) —
+/// so data that never arrived renders as silence and playback self-heals with
+/// no state machine in the render path.
 ///
 /// Single writer + single reader. Positions cross threads through the C-shim
 /// atomics; sample memory races only when reader and writer collide on a
@@ -122,7 +124,8 @@ final class TimelineRingBuffer {
     // MARK: Reader (render thread — RT-safe: no locks, no allocation)
 
     /// Copy `frames` frames starting at `position` into the (non-interleaved
-    /// Float32) destination pointers, zeroing the consumed ring region behind.
+    /// Float32) destination pointers. Does NOT zero — call `zero(from:to:)`
+    /// for the fully-consumed range afterwards.
     func read(
         into destinations: UnsafeMutableBufferPointer<UnsafeMutablePointer<Float>?>,
         from position: Int64,
@@ -135,9 +138,23 @@ final class TimelineRingBuffer {
         for ch in 0..<channelCount where ch < destinations.count {
             guard let dst = destinations[ch] else { continue }
             dst.update(from: channels[ch].advanced(by: start), count: firstSegment)
-            vDSP_vclr(channels[ch].advanced(by: start), 1, vDSP_Length(firstSegment))
             if secondSegment > 0 {
                 dst.advanced(by: firstSegment).update(from: channels[ch], count: secondSegment)
+            }
+        }
+    }
+
+    /// Silence the timeline range `[from, to)` (consumed or skipped regions).
+    /// RT-safe. Ranges wider than the ring clear the whole ring.
+    func zero(from: Int64, to: Int64) {
+        guard to > from else { return }
+        let count = Int(min(to - from, Int64(Self.capacityFrames)))
+        let start = Int(from & mask)
+        let firstSegment = min(count, Self.capacityFrames - start)
+        let secondSegment = count - firstSegment
+        for ch in 0..<channelCount {
+            vDSP_vclr(channels[ch].advanced(by: start), 1, vDSP_Length(firstSegment))
+            if secondSegment > 0 {
                 vDSP_vclr(channels[ch], 1, vDSP_Length(secondSegment))
             }
         }

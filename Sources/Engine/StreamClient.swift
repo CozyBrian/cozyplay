@@ -29,7 +29,7 @@ final class StreamClient {
     private var connection: NWConnection?
     private var reader = FrameReader()
     private let clock = SyncClock()
-    private let playback = PlaybackEngine()
+    private let playback: PlaybackEngine
     private var pingTimer: DispatchSourceTimer?
     private var pongsSeen = 0
     private var reconnectAttempt = 0
@@ -39,6 +39,7 @@ final class StreamClient {
         self.endpoint = endpoint
         self.hostID = hostID
         self.displayName = displayName
+        self.playback = PlaybackEngine(clock: clock)
     }
 
     func connect() {
@@ -73,8 +74,9 @@ final class StreamClient {
         reader = FrameReader()
         clock.reset()
         clock.onDesync = { [weak self] in
-            // TODO(M-3): playback.hardResync()
-            self?.log.info("clock step detected")
+            guard let self else { return }
+            self.log.info("clock step detected — hard resync")
+            self.playback.hardResync()
         }
 
         connection.stateUpdateHandler = { [weak self, weak connection] state in
@@ -141,6 +143,7 @@ final class StreamClient {
             guard let welcome = try? WireProtocol.decodeJSON(WelcomeMessage.self, from: payload) else { return }
             playback.volumePercent = welcome.volumePercent
             playback.muted = welcome.muted
+            playback.latencyTrimMs = welcome.latencyMs
             do {
                 try playback.start()
                 setState(.playing)
@@ -149,7 +152,7 @@ final class StreamClient {
             }
         case .audio:
             guard let chunk = AudioChunk.decode(payload: payload) else { return }
-            playback.ingestPlayOnArrival(chunk)
+            playback.ingest(chunk)
         case .pong:
             guard let pong = WireProtocol.decodePong(payload) else { return }
             clock.ingestPong(t0: pong.t0, t1: pong.t1, t2: pong.t2)
@@ -162,8 +165,13 @@ final class StreamClient {
             guard let msg = try? WireProtocol.decodeJSON(SetVolumeMessage.self, from: payload) else { return }
             playback.volumePercent = msg.percent
             playback.muted = msg.muted
-        case .setName, .setLatency, .setBuffer:
-            break   // TODO(M-3/M-4): latency trim + buffer changes
+        case .setLatency:
+            guard let msg = try? WireProtocol.decodeJSON(SetLatencyMessage.self, from: payload) else { return }
+            playback.latencyTrimMs = msg.latencyMs
+        case .setName, .setBuffer:
+            // Name is host-side display state; buffer changes ride the new
+            // play-at stamps (no client coordination needed).
+            break
         case .bye:
             closed = true
             pingTimer?.cancel()

@@ -58,7 +58,10 @@ final class SystemAudioTap {
         description.uuid = UUID()
         description.name = "cozyplay-tap"
         description.isPrivate = true
-        description.muteBehavior = .unmuted
+        // Mute the tapped processes' direct output: the host hears the engine's
+        // *delayed* local playback instead, so it stays aligned with the
+        // companions rather than running one buffer ahead of them.
+        description.muteBehavior = .mutedWhenTapped
 
         // 2. Create the process tap.
         var newTapID = AudioObjectID(kAudioObjectUnknown)

@@ -35,6 +35,12 @@ final class AudioServer {
     private let assembler = ChunkAssembler()
     private var stopped = false
 
+    /// The host's own speakers, fed by direct injection in the fan-out loop —
+    /// same jitter-buffer/servo path as every companion (the servo still
+    /// matters locally: the output device's clock differs from mach time).
+    /// `IdentityClock` because host timeline time *is* local time here.
+    let localPlayback = PlaybackEngine(clock: IdentityClock())
+
     /// Per-speaker settings, keyed by stable hostID. Kept across rejoins so a
     /// returning Mac gets its name/volume back. (M-4: persisted + pushed to clients.)
     private struct SpeakerState {
@@ -88,6 +94,15 @@ final class AudioServer {
         }
         listener.start(queue: netQueue)
         self.listener = listener
+
+        do {
+            try localPlayback.start()
+        } catch {
+            // Companions can still join and play; only the host's own speakers are out.
+            DispatchQueue.main.async {
+                self.onError?("This Mac's own playback couldn't start: \(error.localizedDescription)")
+            }
+        }
         pushRoster()
     }
 
@@ -101,6 +116,7 @@ final class AudioServer {
             sessions.removeAll()
             listener?.cancel()
             listener = nil
+            localPlayback.stop()
         }
     }
 
@@ -135,6 +151,11 @@ final class AudioServer {
             guard var state = states[clientID] else { return }
             mutate(&state)
             states[clientID] = state
+            if clientID == localHostID {
+                localPlayback.volumePercent = state.volumePercent
+                localPlayback.muted = state.muted
+                localPlayback.latencyTrimMs = state.latencyMs
+            }
             // TODO(M-4): push the change to the affected client connection.
             pushRoster()
         }
@@ -245,7 +266,7 @@ final class AudioServer {
             for session in sessions where session.hello != nil {
                 send(frame, to: session)
             }
-            // TODO(M-3): localPlayback.ingest(audio) — host's own speakers.
+            localPlayback.ingest(audio)
         }
     }
 
