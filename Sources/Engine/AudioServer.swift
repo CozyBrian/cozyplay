@@ -24,7 +24,13 @@ final class AudioServer {
     func setBuffer(ms: Int) {
         netQueue.async {
             self._bufferMs = max(EngineConstants.minBufferMs, min(EngineConstants.maxBufferMs, ms))
-            // TODO(M-4): broadcast SetBufferMessage to clients.
+            // Clients don't need to coordinate (the new delay rides the play-at
+            // stamps); the broadcast is informational/protocol completeness.
+            if let frame = try? WireProtocol.frame(.setBuffer, json: SetBufferMessage(bufferMs: self._bufferMs)) {
+                for session in self.sessions where session.hello != nil {
+                    session.connection.send(content: frame, completion: .idempotent)
+                }
+            }
         }
     }
     private var _bufferMs = EngineConstants.defaultBufferMs
@@ -41,15 +47,16 @@ final class AudioServer {
     /// `IdentityClock` because host timeline time *is* local time here.
     let localPlayback = PlaybackEngine(clock: IdentityClock())
 
-    /// Per-speaker settings, keyed by stable hostID. Kept across rejoins so a
-    /// returning Mac gets its name/volume back. (M-4: persisted + pushed to clients.)
-    private struct SpeakerState {
+    /// Per-speaker settings, keyed by stable hostID. Persisted to UserDefaults
+    /// so a returning Mac gets its name/volume/latency back across parties.
+    private struct SpeakerState: Codable {
         var name: String
         var volumePercent = 100
         var muted = false
         var latencyMs = 0
     }
     private var states: [String: SpeakerState] = [:]
+    private static let statesDefaultsKey = "cozyplay.speakerStates"
 
     private let maxInFlightChunks = 25            // ~500ms of audio stuck in flight
     private let saturationLimitNs: UInt64 = 5_000_000_000
@@ -60,14 +67,21 @@ final class AudioServer {
         var hello: HelloMessage?
         var inFlightChunks = 0
         var saturatedSinceNs: UInt64?
+        var lastActivityNs = HostClock.nowNs()
         init(connection: NWConnection) { self.connection = connection }
     }
+
+    private var livenessTimer: DispatchSourceTimer?
+    private let livenessLimitNs: UInt64 = 5_000_000_000
 
     init(partyName: String, localName: String, localHostID: String) {
         self.partyName = partyName
         self.localName = localName
         self.localHostID = localHostID
-        states[localHostID] = SpeakerState(name: "\(localName) (host)")
+        states = Self.loadStates()
+        if states[localHostID] == nil {
+            states[localHostID] = SpeakerState(name: "\(localName) (host)")
+        }
     }
 
     // MARK: Lifecycle
@@ -97,12 +111,34 @@ final class AudioServer {
 
         do {
             try localPlayback.start()
+            if let localState = states[localHostID] {
+                localPlayback.volumePercent = localState.volumePercent
+                localPlayback.muted = localState.muted
+                localPlayback.latencyTrimMs = localState.latencyMs
+            }
         } catch {
             // Companions can still join and play; only the host's own speakers are out.
             DispatchQueue.main.async {
                 self.onError?("This Mac's own playback couldn't start: \(error.localizedDescription)")
             }
         }
+
+        // Liveness: pings arrive 1/s per client; a session silent for 5s is gone
+        // even if TCP hasn't noticed yet.
+        let timer = DispatchSource.makeTimerSource(queue: netQueue)
+        timer.setEventHandler { [weak self] in
+            guard let self else { return }
+            let now = HostClock.nowNs()
+            for session in self.sessions where session.hello != nil {
+                if now - session.lastActivityNs > self.livenessLimitNs {
+                    self.drop(session)
+                }
+            }
+        }
+        timer.schedule(deadline: .now() + 2, repeating: 2.0)
+        timer.resume()
+        livenessTimer = timer
+
         pushRoster()
     }
 
@@ -116,6 +152,8 @@ final class AudioServer {
             sessions.removeAll()
             listener?.cancel()
             listener = nil
+            livenessTimer?.cancel()
+            livenessTimer = nil
             localPlayback.stop()
         }
     }
@@ -135,28 +173,48 @@ final class AudioServer {
     // MARK: Speaker controls (any queue; roster authority lives here)
 
     func setVolume(clientID: String, percent: Int, muted: Bool) {
-        updateState(clientID) { $0.volumePercent = max(0, min(100, percent)); $0.muted = muted }
+        updateState(clientID) { state in
+            state.volumePercent = max(0, min(100, percent))
+            state.muted = muted
+        } push: { state in
+            try? WireProtocol.frame(.setVolume, json: SetVolumeMessage(percent: state.volumePercent, muted: state.muted))
+        }
     }
 
     func setName(clientID: String, name: String) {
-        updateState(clientID) { $0.name = name }
+        updateState(clientID) { state in
+            state.name = name
+        } push: { state in
+            try? WireProtocol.frame(.setName, json: SetNameMessage(name: state.name))
+        }
     }
 
     func setLatency(clientID: String, latencyMs: Int) {
-        updateState(clientID) { $0.latencyMs = latencyMs }
+        updateState(clientID) { state in
+            state.latencyMs = max(-100, min(100, latencyMs))
+        } push: { state in
+            try? WireProtocol.frame(.setLatency, json: SetLatencyMessage(latencyMs: state.latencyMs))
+        }
     }
 
-    private func updateState(_ clientID: String, _ mutate: @escaping (inout SpeakerState) -> Void) {
+    private func updateState(
+        _ clientID: String,
+        _ mutate: @escaping (inout SpeakerState) -> Void,
+        push makeFrame: @escaping (SpeakerState) -> Data?
+    ) {
         netQueue.async { [self] in
             guard var state = states[clientID] else { return }
             mutate(&state)
             states[clientID] = state
+            saveStates()
             if clientID == localHostID {
                 localPlayback.volumePercent = state.volumePercent
                 localPlayback.muted = state.muted
                 localPlayback.latencyTrimMs = state.latencyMs
+            } else if let session = sessions.first(where: { $0.hello?.hostID == clientID }),
+                      let frame = makeFrame(state) {
+                session.connection.send(content: frame, completion: .idempotent)
             }
-            // TODO(M-4): push the change to the affected client connection.
             pushRoster()
         }
     }
@@ -215,6 +273,7 @@ final class AudioServer {
     }
 
     private func handle(_ type: WireProtocol.FrameType, _ payload: Data, from session: ClientSession) {
+        session.lastActivityNs = HostClock.nowNs()
         switch type {
         case .ping:
             guard let t0 = WireProtocol.decodePing(payload) else { return }
@@ -232,6 +291,7 @@ final class AudioServer {
             // Rejoining Macs keep their previous settings; first-timers get defaults.
             let state = states[hello.hostID] ?? SpeakerState(name: hello.name)
             states[hello.hostID] = state
+            saveStates()
             let welcome = WelcomeMessage(
                 bufferMs: _bufferMs,
                 sampleRate: EngineConstants.sampleRate,
@@ -293,6 +353,9 @@ final class AudioServer {
     // MARK: Roster (net queue)
 
     /// Safe to call from any queue: state is always read on the net queue.
+    /// Speakers that joined this party and left stay listed (grey tile) so the
+    /// host can see who dropped; speakers from *previous* parties don't appear
+    /// until they say hello again.
     private func pushRoster() {
         netQueue.async { [weak self] in
             guard let self else { return }
@@ -300,12 +363,36 @@ final class AudioServer {
             if let localState = self.states[self.localHostID] {
                 list.append(self.speaker(id: self.localHostID, state: localState, connected: true, isThisMac: true))
             }
-            for session in self.sessions {
-                guard let hello = session.hello, let state = self.states[hello.hostID] else { continue }
-                list.append(self.speaker(id: hello.hostID, state: state, connected: true, isThisMac: false))
+            let connectedIDs = Set(self.sessions.compactMap { $0.hello?.hostID })
+            for id in connectedIDs {
+                guard let state = self.states[id] else { continue }
+                list.append(self.speaker(id: id, state: state, connected: true, isThisMac: false))
             }
-            let snapshot = list
+            for id in self.seenThisParty.subtracting(connectedIDs) where id != self.localHostID {
+                guard let state = self.states[id] else { continue }
+                list.append(self.speaker(id: id, state: state, connected: false, isThisMac: false))
+            }
+            self.seenThisParty.formUnion(connectedIDs)
+            let snapshot = list.sorted { ($0.isThisMac ? 0 : 1, $0.displayName) < ($1.isThisMac ? 0 : 1, $1.displayName) }
             DispatchQueue.main.async { self.onSpeakers?(snapshot) }
+        }
+    }
+
+    private var seenThisParty: Set<String> = []
+
+    // MARK: Persistence
+
+    private static func loadStates() -> [String: SpeakerState] {
+        guard let data = UserDefaults.standard.data(forKey: statesDefaultsKey),
+              let decoded = try? JSONDecoder().decode([String: SpeakerState].self, from: data) else {
+            return [:]
+        }
+        return decoded
+    }
+
+    private func saveStates() {
+        if let data = try? JSONEncoder().encode(states) {
+            UserDefaults.standard.set(data, forKey: Self.statesDefaultsKey)
         }
     }
 
