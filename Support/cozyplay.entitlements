@@ -6,15 +6,9 @@
 	<key>com.apple.security.device.audio-input</key>
 	<true/>
 
-	<!-- Deliberately NOT sandboxed: we spawn helper processes (snapserver/snapclient)
-	     that open listening TCP sockets and a /tmp FIFO, which App Sandbox forbids.
+	<!-- Not sandboxed (by choice, not necessity): the in-process engine only needs
+	     network client/server + audio-input, which the sandbox permits, but staying
+	     unsandboxed avoids churn while the engine stabilizes.
 	     (No com.apple.security.app-sandbox key.) -->
-
-	<!-- The bundled Snapcast helpers link dylibs (flac, opus, boost, …) that are not
-	     signed with our Team ID, which trips Hardened Runtime library validation.
-	     Simplest path for development. For distribution, prefer re-signing the helpers
-	     and their dylibs with your Developer ID (@loader_path) and removing this. -->
-	<key>com.apple.security.cs.disable-library-validation</key>
-	<true/>
 </dict>
 </plist>

@@ -7,59 +7,48 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		061BE7F3CFA6612E49C05509 /* SnapcastClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02187E12EEB61EB85946A073 /* SnapcastClient.swift */; };
 		0E5665644590D0BEAD942112 /* PCMConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6FFF911E5F508E8B232015 /* PCMConverter.swift */; };
 		1B8C2C5ECEC2216B46119ED4 /* HostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD017D40A1DE2CB0077113F5 /* HostController.swift */; };
-		36CA47E44D2B179C695FFDD8 /* BonjourAdvertiser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE95EA8CC73E074C9F8AA12A /* BonjourAdvertiser.swift */; };
+		2A9EA00F6AC09DD67B58D31E /* HostIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0F502BCA0E9BE9AFF82A7F /* HostIdentity.swift */; };
 		4010DF0B6C0E64CAE961F295 /* AudioMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEB761FD235CD38481075ED /* AudioMeter.swift */; };
+		402425ADF77FB630A8B1EF66 /* EngineConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D1B1F14D823222FAC2418E /* EngineConstants.swift */; };
 		4CE4C17FDE82179F17D3AACD /* cozyplayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A40F1F0C474B8D84913A6B4 /* cozyplayApp.swift */; };
 		4ECF5499D748709E31D15D4C /* DeviceTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */; };
-		799210B3478060FB2699AC99 /* SnapcastServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB07863C544139A30976B138 /* SnapcastServer.swift */; };
-		88F27E3161090563848E1910 /* SnapcastRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7DE7639289AA90B5312C6C /* SnapcastRPC.swift */; };
 		89FACB97E929617DAD7CBA16 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6026B661C662AFCF34F9314B /* Speaker.swift */; };
 		9B3A5D56348811107DB50A58 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2046BA0B94357FBFCC77411 /* AppState.swift */; };
 		9E4497EDA2768F7CF1AB2A62 /* RolePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2740C24DEDF110C83A967D83 /* RolePickerView.swift */; };
 		9FA1ED3FEF3AE0315DE9C70F /* SystemAudioTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A880051C3838137B3AC49A /* SystemAudioTap.swift */; };
-		A42A1700D0BD2E7726C8EA5E /* SnapcastBinaries.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9167057DA462A9676111929 /* SnapcastBinaries.swift */; };
-		A9C55E708D533B555DFE842F /* snapserver.conf.template in Resources */ = {isa = PBXBuildFile; fileRef = 98188F0F952923F4F7B5A0E3 /* snapserver.conf.template */; };
 		AFE327447E4F96C3C1200018 /* JoinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92121F282E73398A9BB9DCA /* JoinView.swift */; };
 		C78E1AE1C7F05D2DCBF30C1B /* JoinController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE023D04D0173850C9E4125 /* JoinController.swift */; };
-		D22A693B1CA67814FA18CC06 /* PipeWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328A57EE3BBC8337AF760210 /* PipeWriter.swift */; };
 		D977DF77E3845348F46F027E /* BonjourBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342F65005282E4810965CCAB /* BonjourBrowser.swift */; };
 		DD926FCC5C69BE9ED7BA2F6B /* HostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5930375862508EC41DC024 /* HostView.swift */; };
 		F8D12240D24DCB4FADFB5D5D /* Party.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1492F8A6403FE099E38F3CD /* Party.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		02187E12EEB61EB85946A073 /* SnapcastClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapcastClient.swift; sourceTree = "<group>"; };
 		0A40F1F0C474B8D84913A6B4 /* cozyplayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cozyplayApp.swift; sourceTree = "<group>"; };
 		0B6FFF911E5F508E8B232015 /* PCMConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCMConverter.swift; sourceTree = "<group>"; };
+		11D1B1F14D823222FAC2418E /* EngineConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineConstants.swift; sourceTree = "<group>"; };
+		1B0F502BCA0E9BE9AFF82A7F /* HostIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostIdentity.swift; sourceTree = "<group>"; };
 		2740C24DEDF110C83A967D83 /* RolePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RolePickerView.swift; sourceTree = "<group>"; };
-		328A57EE3BBC8337AF760210 /* PipeWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipeWriter.swift; sourceTree = "<group>"; };
 		342F65005282E4810965CCAB /* BonjourBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourBrowser.swift; sourceTree = "<group>"; };
 		4B5930375862508EC41DC024 /* HostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostView.swift; sourceTree = "<group>"; };
 		5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTileView.swift; sourceTree = "<group>"; };
 		6026B661C662AFCF34F9314B /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
-		6B7DE7639289AA90B5312C6C /* SnapcastRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapcastRPC.swift; sourceTree = "<group>"; };
 		7EE023D04D0173850C9E4125 /* JoinController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinController.swift; sourceTree = "<group>"; };
-		98188F0F952923F4F7B5A0E3 /* snapserver.conf.template */ = {isa = PBXFileReference; lastKnownFileType = text; path = snapserver.conf.template; sourceTree = "<group>"; };
 		A1492F8A6403FE099E38F3CD /* Party.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Party.swift; sourceTree = "<group>"; };
-		BE95EA8CC73E074C9F8AA12A /* BonjourAdvertiser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourAdvertiser.swift; sourceTree = "<group>"; };
 		C2046BA0B94357FBFCC77411 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		CD017D40A1DE2CB0077113F5 /* HostController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostController.swift; sourceTree = "<group>"; };
 		CFEB761FD235CD38481075ED /* AudioMeter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMeter.swift; sourceTree = "<group>"; };
 		D2A880051C3838137B3AC49A /* SystemAudioTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAudioTap.swift; sourceTree = "<group>"; };
 		D47E52339D9060A4C233BB27 /* cozyplay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cozyplay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D92121F282E73398A9BB9DCA /* JoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinView.swift; sourceTree = "<group>"; };
-		DB07863C544139A30976B138 /* SnapcastServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapcastServer.swift; sourceTree = "<group>"; };
-		F9167057DA462A9676111929 /* SnapcastBinaries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapcastBinaries.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		18D5C12E4B38438DFBDF7A2A /* Discovery */ = {
 			isa = PBXGroup;
 			children = (
-				BE95EA8CC73E074C9F8AA12A /* BonjourAdvertiser.swift */,
 				342F65005282E4810965CCAB /* BonjourBrowser.swift */,
 			);
 			path = Discovery;
@@ -76,7 +65,6 @@
 		2347ED5568DCC59B6C1BB4BF = {
 			isa = PBXGroup;
 			children = (
-				BD6F3107CEDE0347989B3B8F /* Resources */,
 				312A21B43B31F5A8401F5A7A /* Sources */,
 				1A27D568ED31D75E6CCAFE1E /* Products */,
 			);
@@ -108,10 +96,8 @@
 		36F6123795D9ADCB1E552FCE /* Engine */ = {
 			isa = PBXGroup;
 			children = (
-				F9167057DA462A9676111929 /* SnapcastBinaries.swift */,
-				02187E12EEB61EB85946A073 /* SnapcastClient.swift */,
-				6B7DE7639289AA90B5312C6C /* SnapcastRPC.swift */,
-				DB07863C544139A30976B138 /* SnapcastServer.swift */,
+				11D1B1F14D823222FAC2418E /* EngineConstants.swift */,
+				1B0F502BCA0E9BE9AFF82A7F /* HostIdentity.swift */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -134,20 +120,11 @@
 			path = App;
 			sourceTree = "<group>";
 		};
-		BD6F3107CEDE0347989B3B8F /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				98188F0F952923F4F7B5A0E3 /* snapserver.conf.template */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		DABC8CF6F11E006C91F275CE /* Audio */ = {
 			isa = PBXGroup;
 			children = (
 				CFEB761FD235CD38481075ED /* AudioMeter.swift */,
 				0B6FFF911E5F508E8B232015 /* PCMConverter.swift */,
-				328A57EE3BBC8337AF760210 /* PipeWriter.swift */,
 				D2A880051C3838137B3AC49A /* SystemAudioTap.swift */,
 			);
 			path = Audio;
@@ -172,7 +149,6 @@
 			buildConfigurationList = 50E933D6C972C53A9E9F4CE8 /* Build configuration list for PBXNativeTarget "cozyplay" */;
 			buildPhases = (
 				678602CC51BAF5557410D9A8 /* Sources */,
-				B88516FF432D50B03BF2D6CD /* Resources */,
 			);
 			buildRules = (
 			);
@@ -218,17 +194,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		B88516FF432D50B03BF2D6CD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A9C55E708D533B555DFE842F /* snapserver.conf.template in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		678602CC51BAF5557410D9A8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -236,21 +201,17 @@
 			files = (
 				9B3A5D56348811107DB50A58 /* AppState.swift in Sources */,
 				4010DF0B6C0E64CAE961F295 /* AudioMeter.swift in Sources */,
-				36CA47E44D2B179C695FFDD8 /* BonjourAdvertiser.swift in Sources */,
 				D977DF77E3845348F46F027E /* BonjourBrowser.swift in Sources */,
 				4ECF5499D748709E31D15D4C /* DeviceTileView.swift in Sources */,
+				402425ADF77FB630A8B1EF66 /* EngineConstants.swift in Sources */,
 				1B8C2C5ECEC2216B46119ED4 /* HostController.swift in Sources */,
+				2A9EA00F6AC09DD67B58D31E /* HostIdentity.swift in Sources */,
 				DD926FCC5C69BE9ED7BA2F6B /* HostView.swift in Sources */,
 				C78E1AE1C7F05D2DCBF30C1B /* JoinController.swift in Sources */,
 				AFE327447E4F96C3C1200018 /* JoinView.swift in Sources */,
 				0E5665644590D0BEAD942112 /* PCMConverter.swift in Sources */,
 				F8D12240D24DCB4FADFB5D5D /* Party.swift in Sources */,
-				D22A693B1CA67814FA18CC06 /* PipeWriter.swift in Sources */,
 				9E4497EDA2768F7CF1AB2A62 /* RolePickerView.swift in Sources */,
-				A42A1700D0BD2E7726C8EA5E /* SnapcastBinaries.swift in Sources */,
-				061BE7F3CFA6612E49C05509 /* SnapcastClient.swift in Sources */,
-				88F27E3161090563848E1910 /* SnapcastRPC.swift in Sources */,
-				799210B3478060FB2699AC99 /* SnapcastServer.swift in Sources */,
 				89FACB97E929617DAD7CBA16 /* Speaker.swift in Sources */,
 				9FA1ED3FEF3AE0315DE9C70F /* SystemAudioTap.swift in Sources */,
 				4CE4C17FDE82179F17D3AACD /* cozyplayApp.swift in Sources */,
@@ -267,16 +228,12 @@
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = CozyPlay;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
-					"@executable_path/../Helpers",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.cozybrian.cozyplay;
+				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplay;
 				PRODUCT_NAME = cozyplay;
 				SDKROOT = macosx;
 			};
@@ -414,16 +371,12 @@
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = CozyPlay;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
-					"@executable_path/../Helpers",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.cozybrian.cozyplay;
+				PRODUCT_BUNDLE_IDENTIFIER = africa.inpathgroup.cozyplay;
 				PRODUCT_NAME = cozyplay;
 				SDKROOT = macosx;
 			};

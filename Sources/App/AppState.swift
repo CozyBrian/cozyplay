@@ -10,7 +10,7 @@ enum AppMode: Equatable {
 
 /// Root observable app state. Owns the per-role controllers, created lazily
 /// when the user chooses "Host" or "Join" so we never start audio capture or
-/// spawn Snapcast processes until a role is actually selected.
+/// open network sockets until a role is actually selected.
 @MainActor
 final class AppState: ObservableObject {
     @Published var mode: AppMode = .picker

@@ -25,7 +25,6 @@
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_cozyplay._tcp</string>
-		<string>_snapcast._tcp</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>cozyplay finds and connects to party speakers on your local network.</string>

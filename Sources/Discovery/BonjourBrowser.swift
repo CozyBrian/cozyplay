@@ -2,7 +2,7 @@ import Foundation
 import Network
 
 /// Browses the LAN for cozyplay parties (`_cozyplay._tcp`) and resolves each to a
-/// reachable host so a companion can point snapclient at the master.
+/// reachable host so a companion can connect its stream client to the master.
 ///
 /// Discovered services are resolved to an IP by briefly opening an NWConnection and
 /// reading the remote endpoint — NWBrowser results alone don't carry an address.

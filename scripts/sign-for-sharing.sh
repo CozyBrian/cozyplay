@@ -32,13 +32,9 @@ rm -rf "$OUT_APP"
 mkdir -p "$OUT_DIR"
 cp -R "$SRC" "$OUT_APP"
 
-# Strip anything that would re-quarantine, then sign inside-out.
+# Strip anything that would re-quarantine, then sign.
 xattr -cr "$OUT_APP"
 
-# Sign nested helpers/dylibs first (if any were bundled), then the app.
-find "$OUT_APP/Contents" \( -name '*.dylib' -o -path '*/Helpers/*' \) -type f 2>/dev/null | while read -r f; do
-  codesign --force --options runtime --timestamp=none --sign "$IDENTITY" "$f" || true
-done
 codesign --force --options runtime --timestamp=none \
   --entitlements "$ENTITLEMENTS" --sign "$IDENTITY" "$OUT_APP"
 

@@ -2,9 +2,9 @@ import Foundation
 import AVFoundation
 import Combine
 
-/// Drives the "Host a party" role: captures system audio, feeds snapserver through a
-/// FIFO, joins the master's own speakers via a local snapclient, advertises over
-/// Bonjour, and mirrors the connected speakers from snapserver's JSON-RPC.
+/// Drives the "Host a party" role: captures system audio via the Core Audio process
+/// tap and feeds the native sync engine, which streams timestamped chunks to every
+/// joined laptop (and this Mac's own speakers) and owns the speaker roster.
 @MainActor
 final class HostController: ObservableObject {
     @Published var speakers: [Speaker] = []
@@ -14,17 +14,13 @@ final class HostController: ObservableObject {
     @Published var isCapturing = false
 
     let partyName: String
-    private let fifoPath = NSTemporaryDirectory() + "cozyplay.fifo"
 
     private let tap = SystemAudioTap()
     private let meter = AudioMeter()
     private var converter: PCMConverter?
-    private var pipe: PipeWriter?
-    private var server: SnapcastServer?
-    private var localClient: SnapcastClient?
-    private var advertiser: BonjourAdvertiser?
-    private var rpc: SnapcastRPC?
-    private let localHostID = SnapcastClient.stableHostID()
+    private let localHostID = HostIdentity.stableID()
+    // TODO(M-2): AudioServer — NWListener + Bonjour service, chunk fan-out,
+    // local playback injection, speaker roster authority.
 
     init(partyName: String) {
         self.partyName = partyName
@@ -34,33 +30,21 @@ final class HostController: ObservableObject {
         meter.onLevel = { [weak self] in self?.level = $0 }
         startEngine()
         startCapture()
-        startControl()
     }
 
     private func startEngine() {
-        do {
-            let pipe = PipeWriter(path: fifoPath)
-            try pipe.ensureFIFO()
-            self.pipe = pipe
-
-            let server = SnapcastServer(fifoPath: fifoPath)
-            try server.start()
-            self.server = server
-            pipe.openForWriting()
-
-            let localClient = SnapcastClient(host: "127.0.0.1", hostID: localHostID, displayName: "\(deviceName()) (host)")
-            try localClient.start()
-            self.localClient = localClient
-
-            let advertiser = BonjourAdvertiser(partyName: partyName)
-            advertiser.start()
-            self.advertiser = advertiser
-
-            statusText = "Hosting “\(partyName)” — waiting for laptops to join"
-        } catch {
-            errorText = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
-            statusText = "Party engine not fully started"
-        }
+        // Native engine lands in M-2; until then hosting is capture + local roster only.
+        speakers = [Speaker(
+            id: localHostID,
+            name: "\(deviceName()) (host)",
+            host: deviceName(),
+            volumePercent: 100,
+            isMuted: false,
+            latencyMs: 0,
+            isConnected: true,
+            isThisMac: true
+        )]
+        statusText = "Hosting “\(partyName)” — native engine not streaming yet"
     }
 
     private func startCapture() {
@@ -71,9 +55,7 @@ final class HostController: ObservableObject {
                 if self.converter == nil, let fmt = self.tap.format {
                     self.converter = PCMConverter(inputFormat: fmt)
                 }
-                if let data = self.converter?.convertToData(buffer) {
-                    self.pipe?.write(data)
-                }
+                // TODO(M-2): engine.ingest(converter output + capture hostTime)
             }
             isCapturing = true
         } catch {
@@ -81,45 +63,35 @@ final class HostController: ObservableObject {
         }
     }
 
-    private func startControl() {
-        let rpc = SnapcastRPC(host: "127.0.0.1")
-        rpc.onSpeakers = { [weak self] speakers in
-            guard let self else { return }
-            self.speakers = speakers.map { speaker in
-                var s = speaker
-                s.isThisMac = (speaker.id == self.localHostID)
-                return s
-            }
-        }
-        rpc.start()
-        self.rpc = rpc
-    }
-
-    // MARK: Speaker controls (proxied to snapserver)
+    // MARK: Speaker controls (proxied to the engine's roster authority)
 
     func setVolume(_ speaker: Speaker, percent: Int) {
-        rpc?.setVolume(clientID: speaker.id, percent: percent, muted: speaker.isMuted)
+        // TODO(M-4): engine.setVolume(clientID:percent:muted:)
+        update(speaker.id) { $0.volumePercent = percent }
     }
 
     func setMuted(_ speaker: Speaker, muted: Bool) {
-        rpc?.setVolume(clientID: speaker.id, percent: speaker.volumePercent, muted: muted)
+        // TODO(M-4): engine.setVolume(clientID:percent:muted:)
+        update(speaker.id) { $0.isMuted = muted }
     }
 
     func rename(_ speaker: Speaker, to name: String) {
-        rpc?.setName(clientID: speaker.id, name: name)
+        // TODO(M-4): engine.setName(clientID:name:)
+        update(speaker.id) { $0.name = name }
     }
 
     func setLatency(_ speaker: Speaker, ms: Int) {
-        rpc?.setLatency(clientID: speaker.id, latencyMs: ms)
+        // TODO(M-4): engine.setLatency(clientID:latencyMs:)
+        update(speaker.id) { $0.latencyMs = ms }
     }
 
     func stop() {
         tap.stop()
-        rpc?.stop()
-        advertiser?.stop()
-        localClient?.stop()
-        server?.stop()
-        pipe?.close()
+    }
+
+    private func update(_ id: String, _ mutate: (inout Speaker) -> Void) {
+        guard let i = speakers.firstIndex(where: { $0.id == id }) else { return }
+        mutate(&speakers[i])
     }
 
     private func deviceName() -> String { Host.current().localizedName ?? "MacBook" }

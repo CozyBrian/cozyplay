@@ -21,8 +21,6 @@ targets:
     platform: macOS
     sources:
       - path: Sources
-      - path: Resources
-        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: africa.inpathgroup.cozyplay
@@ -33,6 +31,3 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         LD_RUNPATH_SEARCH_PATHS:
           - "@executable_path/../Frameworks"
-          - "@executable_path/../Helpers"
-    # NOTE: bundled snapserver/snapclient binaries are copied into Contents/Helpers
-    # by scripts/build-snapcast.sh (a manual step / future Run Script phase), not by xcodegen.

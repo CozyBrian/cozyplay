@@ -7,7 +7,5 @@
 	     the one that built it — strip it for anything you copy to another laptop. -->
 	<key>com.apple.security.device.audio-input</key>
 	<true/>
-	<key>com.apple.security.cs.disable-library-validation</key>
-	<true/>
 </dict>
 </plist>

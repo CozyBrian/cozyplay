@@ -2,8 +2,8 @@ import Foundation
 import Combine
 
 /// Drives the "Join a party" role: browses Bonjour for hosts and, once the user
-/// picks one, launches a snapclient pointed at the master so this laptop plays the
-/// synced stream.
+/// picks one, connects the native stream client so this laptop plays the synced
+/// stream.
 @MainActor
 final class JoinController: ObservableObject {
     @Published var parties: [Party] = []
@@ -12,7 +12,7 @@ final class JoinController: ObservableObject {
     @Published var errorText: String?
 
     private let browser = BonjourBrowser()
-    private var client: SnapcastClient?
+    // TODO(M-2): StreamClient — connect, clock sync, jitter buffer, playback.
 
     func startBrowsing() {
         browser.onParties = { [weak self] parties in
@@ -29,28 +29,19 @@ final class JoinController: ObservableObject {
 
     func join(_ party: Party) {
         errorText = nil
-        do {
-            let client = SnapcastClient(host: party.host, displayName: deviceName())
-            try client.start()
-            self.client = client
-            connectedParty = party
-            statusText = "Connected to “\(party.name)” — playing in sync"
-        } catch {
-            errorText = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
-        }
+        // TODO(M-2): connect a StreamClient to party.host:party.port and surface
+        // its state changes here; until then joining is discovery-only.
+        connectedParty = party
+        statusText = "Joined “\(party.name)” — native playback engine not built yet"
     }
 
     func leave() {
-        client?.stop()
-        client = nil
         connectedParty = nil
         statusText = parties.isEmpty ? "Looking for parties…" : "Found \(parties.count)"
     }
 
     func stop() {
         browser.stop()
-        client?.stop()
-        client = nil
     }
 
     private func deviceName() -> String { Host.current().localizedName ?? "MacBook" }

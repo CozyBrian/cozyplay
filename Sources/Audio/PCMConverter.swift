@@ -2,21 +2,16 @@ import Foundation
 import AVFoundation
 
 /// Converts captured audio (Float32, at the tapped device's mix format — rate,
-/// channel count and interleaving all vary) into the interleaved **Int16 @ 48kHz
-/// stereo** that snapserver's pipe source requires. Snapcast's pipe accepts integer
-/// PCM only, so this Float32 → S16LE step is mandatory.
+/// channel count and interleaving all vary) into the engine's interleaved
+/// **Int16 @ 48kHz stereo** wire format (`EngineConstants.wireFormat`).
 final class PCMConverter {
     private let converter: AVAudioConverter
     private let outputFormat: AVAudioFormat
 
     /// - Parameter inputFormat: the tap's actual format, read from `kAudioTapPropertyFormat`.
     init?(inputFormat: AVAudioFormat) {
-        guard let outFormat = AVAudioFormat(
-            commonFormat: .pcmFormatInt16,
-            sampleRate: Double(SnapcastServer.sampleRate),
-            channels: AVAudioChannelCount(SnapcastServer.channels),
-            interleaved: true
-        ), let conv = AVAudioConverter(from: inputFormat, to: outFormat) else {
+        let outFormat = EngineConstants.wireFormat
+        guard let conv = AVAudioConverter(from: inputFormat, to: outFormat) else {
             return nil
         }
         outputFormat = outFormat

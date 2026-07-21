@@ -1,17 +1,17 @@
 import Foundation
 
-/// One speaker in the party — a Snapcast client as reported by `Server.GetStatus`.
+/// One speaker in the party, as reported by the host's roster.
 struct Speaker: Identifiable, Hashable {
-    /// Snapcast client id (stable host id; we set it via snapclient --hostID).
+    /// Stable per-machine id (`HostIdentity.stableID()`).
     let id: String
-    /// Friendly, user-editable name (Snapcast `config.name`, falling back to the host).
+    /// Friendly, user-editable name (falls back to the host name).
     var name: String
     /// Machine host name reported by the client.
     var host: String
     /// 0...100
     var volumePercent: Int
     var isMuted: Bool
-    /// Per-client latency trim in milliseconds (Snapcast `config.latency`).
+    /// Per-speaker latency trim in milliseconds (renders earlier by this much).
     var latencyMs: Int
     var isConnected: Bool
     /// True for the speaker that is this same machine (the local/master client).
