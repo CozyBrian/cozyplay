@@ -39,6 +39,7 @@ final class AudioServer {
     func setBuffer(ms: Int) {
         netQueue.async {
             self._bufferMs = max(EngineConstants.minBufferMs, min(EngineConstants.maxBufferMs, ms))
+            self.localPlayback.partyBufferMs = self._bufferMs
             // Clients don't need to coordinate (the new delay rides the play-at
             // stamps); the broadcast is informational/protocol completeness.
             if let frame = try? WireProtocol.frame(.setBuffer, json: SetBufferMessage(bufferMs: self._bufferMs)) {
@@ -108,7 +109,13 @@ final class AudioServer {
             states[localHostID] = SpeakerState(name: "\(localName) (host)")
         }
         localPlayback.onPlaybackIssue = { [weak self] message in
-            self?.onLocalPlaybackIssue?(message)   // already on main
+            guard let self else { return }
+            if let message {
+                self.log.warning("local playback issue: \(message, privacy: .public)")
+            } else {
+                self.log.info("local playback issue cleared")
+            }
+            self.onLocalPlaybackIssue?(message)   // already on main
         }
     }
 
@@ -137,6 +144,7 @@ final class AudioServer {
         listener.start(queue: netQueue)
         self.listener = listener
 
+        localPlayback.partyBufferMs = _bufferMs
         do {
             try localPlayback.start()
             // A muted host tile from a previous session is never the intent when

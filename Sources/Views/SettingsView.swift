@@ -97,8 +97,8 @@ struct PlaybackDiagnosticsGrid: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(String(
-                format: "%@: peak %.2f · buffered %dms · servo %+.2fms",
-                title, d.renderPeak, d.bufferedMs, d.servoErrorMs
+                format: "%@: peak %.2f · buffered %dms · servo %+.2fms · outLat %dms",
+                title, d.renderPeak, d.bufferedMs, d.servoErrorMs, d.outputLatencyMs
             ))
             Text(String(
                 format: "writes %d · late %d · underruns %d · jumps %d · badTS %d · restarts %d/%d",

@@ -39,7 +39,21 @@ final class PlaybackEngine {
     // Restart-retry state (controlQueue-confined).
     private var restartAttempts = 0
     private var retryWorkItem: DispatchWorkItem?
-    private var issueActive = false
+    private var restartIssue: String?
+    private var latencyIssue: String?
+    private var lastNotifiedIssue: String? = ""   // "" ≠ nil so the first push always fires
+
+    // Output-latency state (controlQueue-confined).
+    private var rawOutputLatencyNs: Int64 = 0
+
+    /// The party's end-to-end delay. High-latency outputs (Bluetooth ≈
+    /// 150–250ms) need the reader to fetch content up to that far ahead —
+    /// which only exists if the buffer is bigger. The applied compensation is
+    /// capped at (buffer − margin); beyond that, playback runs late relative
+    /// to the party and `onPlaybackIssue` says how to fix it.
+    var partyBufferMs: Int = EngineConstants.defaultBufferMs {
+        didSet { controlQueue.async { self.applyLatencyCompensation() } }
+    }
 
     // Cross-thread flags/counters owned here (rest live in RenderState).
     private let writerRemapFlagStorage = UnsafeMutablePointer<Int64>.allocate(capacity: 1)
@@ -109,8 +123,31 @@ final class PlaybackEngine {
 
         engine.prepare()
         try engine.start()
-        state.setLatencyCompensationNs(Self.outputLatencyNs(of: engine))
+        rawOutputLatencyNs = Self.outputLatencyNs(of: engine)
+        applyLatencyCompensation()
         isRunning = true
+    }
+
+    /// Cap the compensation at what the buffer can supply (chunks arrive
+    /// roughly `bufferMs − 35ms` ahead of their deadline; keep 50ms margin).
+    /// Runs on controlQueue.
+    private func applyLatencyCompensation() {
+        let clampNs = max(0, Int64(partyBufferMs - 50)) * 1_000_000
+        state.setLatencyCompensationNs(min(rawOutputLatencyNs, clampNs))
+        if rawOutputLatencyNs > clampNs {
+            let deviceMs = rawOutputLatencyNs / 1_000_000
+            latencyIssue = "This output device adds \(deviceMs)ms of latency — more than the party delay can absorb. Audio will play slightly behind the other speakers. Raise the playback delay to \(deviceMs + 60)ms or more to fix it."
+        } else {
+            latencyIssue = nil
+        }
+        pushIssueIfChanged()
+    }
+
+    private func pushIssueIfChanged() {
+        let issue = restartIssue ?? latencyIssue
+        guard issue != lastNotifiedIssue else { return }
+        lastNotifiedIssue = issue
+        notifyIssue(issue)
     }
 
     private func stopLocked() {
@@ -146,22 +183,20 @@ final class PlaybackEngine {
         engine.prepare()
         do {
             try engine.start()
-            state.setLatencyCompensationNs(Self.outputLatencyNs(of: engine))
+            rawOutputLatencyNs = Self.outputLatencyNs(of: engine)
             applyVolume()
             hardResync()
             restartAttempts = 0
             _ = rt_atomic_add(engineRestartsStorage, 1)
-            if issueActive {
-                issueActive = false
-                notifyIssue(nil)
-            }
+            restartIssue = nil
+            applyLatencyCompensation()   // also pushes the (possibly cleared) issue
         } catch {
             restartAttempts += 1
             if restartAttempts >= 5 {
                 restartAttempts = 0    // future config changes retry fresh
                 _ = rt_atomic_add(engineRestartFailuresStorage, 1)
-                issueActive = true
-                notifyIssue("Playback couldn't restart after an audio device change: \(error.localizedDescription)")
+                restartIssue = "Playback couldn't restart after an audio device change: \(error.localizedDescription)"
+                pushIssueIfChanged()
                 return
             }
             let delay = 0.5 * pow(2.0, Double(restartAttempts - 1))   // 0.5, 1, 2, 4s
@@ -220,6 +255,7 @@ final class PlaybackEngine {
         /// problem; no lastRender updates ⇒ engine dead.
         var renderPeak: Double
         var msSinceLastRender: Int      // -1 if the render callback never ran
+        var outputLatencyMs: Int        // what the output device reports (uncapped)
         var underrunCycles: Int
         var invalidTimestampCycles: Int
         var jumpCount: Int
@@ -238,6 +274,7 @@ final class PlaybackEngine {
             servoErrorMs: state.servoErrorMs,
             renderPeak: state.takeRenderPeak(),
             msSinceLastRender: lastRender == 0 ? -1 : Int((HostClock.nowNs() - min(lastRender, HostClock.nowNs())) / 1_000_000),
+            outputLatencyMs: Int(controlQueue.sync { rawOutputLatencyNs } / 1_000_000),
             underrunCycles: Int(state.underrunCycles),
             invalidTimestampCycles: Int(state.invalidTimestampCycles),
             jumpCount: Int(state.jumpCount),

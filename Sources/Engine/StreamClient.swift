@@ -153,6 +153,7 @@ final class StreamClient {
             playback.volumePercent = welcome.volumePercent
             playback.muted = welcome.muted
             playback.latencyTrimMs = welcome.latencyMs
+            playback.partyBufferMs = welcome.bufferMs
             do {
                 try playback.start()
                 setState(.playing)
@@ -185,10 +186,13 @@ final class StreamClient {
         case .setLatency:
             guard let msg = try? WireProtocol.decodeJSON(SetLatencyMessage.self, from: payload) else { return }
             playback.latencyTrimMs = msg.latencyMs
-        case .setName, .setBuffer:
-            // Name is host-side display state; buffer changes ride the new
-            // play-at stamps (no client coordination needed).
-            break
+        case .setBuffer:
+            // Buffer changes ride the new play-at stamps; we only track the
+            // value so the output-latency clamp knows how far ahead it may run.
+            guard let msg = try? WireProtocol.decodeJSON(SetBufferMessage.self, from: payload) else { return }
+            playback.partyBufferMs = msg.bufferMs
+        case .setName:
+            break   // name is host-side display state
         case .bye:
             closed = true
             pingTimer?.cancel()
