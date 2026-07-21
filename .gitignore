@@ -7,8 +7,8 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 
+# Shareable build output (regenerate with scripts/sign-for-sharing.sh)
+dist/
+
 # macOS
 .DS_Store
-
-# Bundled Snapcast helpers (produced by scripts/build-snapcast.sh)
-Contents/Helpers/
