@@ -19,6 +19,7 @@
 		4010DF0B6C0E64CAE961F295 /* AudioMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEB761FD235CD38481075ED /* AudioMeter.swift */; };
 		402425ADF77FB630A8B1EF66 /* EngineConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D1B1F14D823222FAC2418E /* EngineConstants.swift */; };
 		4147DD012E9C52E629A63ADD /* PCMConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6FFF911E5F508E8B232015 /* PCMConverter.swift */; };
+		46671468E648C2551BAAB3C0 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A92A366CE990C238235E275F /* AppIcon.icns */; };
 		4CE4C17FDE82179F17D3AACD /* cozyplayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A40F1F0C474B8D84913A6B4 /* cozyplayApp.swift */; };
 		4ECF5499D748709E31D15D4C /* DeviceTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */; };
 		55EC09F57BF939408F769BA5 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB06945DDB8C014E5F35922 /* AppSettings.swift */; };
@@ -81,6 +82,7 @@
 		942D6414F2BDDC832428544C /* TimelinePlacerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePlacerTests.swift; sourceTree = "<group>"; };
 		A1492F8A6403FE099E38F3CD /* Party.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Party.swift; sourceTree = "<group>"; };
 		A4E48DE535FFCCB1E10DE439 /* AudioServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServer.swift; sourceTree = "<group>"; };
+		A92A366CE990C238235E275F /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		BB6E6BFF1D9D750FB5976BFB /* ChunkAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkAssembler.swift; sourceTree = "<group>"; };
 		BF4EDDA666710D4B283094A7 /* RTAtomics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RTAtomics.h; sourceTree = "<group>"; };
 		C2046BA0B94357FBFCC77411 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 		2347ED5568DCC59B6C1BB4BF = {
 			isa = PBXGroup;
 			children = (
+				BD6F3107CEDE0347989B3B8F /* Resources */,
 				312A21B43B31F5A8401F5A7A /* Sources */,
 				0BED9793B52BD19F70B0CD76 /* Tests */,
 				1A27D568ED31D75E6CCAFE1E /* Products */,
@@ -197,6 +200,14 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		BD6F3107CEDE0347989B3B8F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A92A366CE990C238235E275F /* AppIcon.icns */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		DABC8CF6F11E006C91F275CE /* Audio */ = {
 			isa = PBXGroup;
 			children = (
@@ -227,6 +238,7 @@
 			buildConfigurationList = 50E933D6C972C53A9E9F4CE8 /* Build configuration list for PBXNativeTarget "cozyplay" */;
 			buildPhases = (
 				678602CC51BAF5557410D9A8 /* Sources */,
+				B88516FF432D50B03BF2D6CD /* Resources */,
 			);
 			buildRules = (
 			);
@@ -293,6 +305,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B88516FF432D50B03BF2D6CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				46671468E648C2551BAAB3C0 /* AppIcon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		678602CC51BAF5557410D9A8 /* Sources */ = {

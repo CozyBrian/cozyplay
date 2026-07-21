@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- cozyplay app icon — "cozy" family style (see cozyfinance-apps, cozycode).
+       Dark-navy rounded tile + blue-gradient stroked glyph with glow.
+       This SVG is the design source of truth; render with scripts/build-icon.mjs. -->
+  <defs>
+    <linearGradient id="tile" x1="154" y1="112" x2="870" y2="908" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#182D40" />
+      <stop offset="0.55" stop-color="#0B1722" />
+      <stop offset="1" stop-color="#060D14" />
+    </linearGradient>
+    <linearGradient id="glyph" x1="300" y1="360" x2="740" y2="660" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8AC8F4" />
+      <stop offset="0.48" stop-color="#5EA4D9" />
+      <stop offset="1" stop-color="#3678B5" />
+    </linearGradient>
+    <filter id="tileShadow" x="28" y="24" width="968" height="988" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="38" stdDeviation="38" flood-color="#000713" flood-opacity="0.48" />
+    </filter>
+    <filter id="glyphGlow" x="200" y="240" width="640" height="560" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#4E9CD7" flood-opacity="0.38" />
+    </filter>
+  </defs>
+
+  <g filter="url(#tileShadow)">
+    <rect x="90" y="72" width="844" height="844" rx="198" fill="url(#tile)" />
+    <rect x="102" y="84" width="820" height="820" rx="186" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="8" />
+    <path d="M156 278C221 159 342 105 476 105H665C777 105 865 178 902 277" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="28" stroke-linecap="round" />
+  </g>
+
+  <g filter="url(#glyphGlow)" stroke="url(#glyph)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- speaker: cabinet + cone as one closed path -->
+    <path d="M496 318V682L376 582H298Q274 582 274 558V442Q274 418 298 418H376Z"
+          fill="#102234" stroke-width="48" />
+    <!-- sound waves -->
+    <path d="M588 393A130 130 0 0 1 588 607" fill="none" stroke-width="48" />
+    <path d="M676 338A215 215 0 0 1 676 662" fill="none" stroke-width="44" />
+  </g>
+  <!-- faint highlight accent (family detail) -->
+  <path d="M572 428A100 100 0 0 1 572 572" fill="none" stroke="#B9E1FA" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" />
+</svg>

@@ -21,6 +21,8 @@ targets:
     platform: macOS
     sources:
       - path: Sources
+      - path: Resources
+        buildPhase: resources
     settings:
       base:
         # Keep signing/bundle identity here (NOT in Xcode's target editor) —

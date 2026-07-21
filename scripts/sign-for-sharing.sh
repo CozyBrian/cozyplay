@@ -22,7 +22,8 @@ OUT_DIR="$ROOT/dist"
 OUT_APP="$OUT_DIR/cozyplay.app"
 
 if [[ -z "$SRC" ]]; then
-  SRC="$(find "$HOME/Library/Developer/Xcode/DerivedData" -name cozyplay.app -path '*Debug*' 2>/dev/null | head -1)"
+  # Exclude Index.noindex — Xcode's indexer builds an incomplete bundle there.
+  SRC="$(find "$HOME/Library/Developer/Xcode/DerivedData" -name cozyplay.app -path '*Debug*' -not -path '*Index.noindex*' 2>/dev/null | head -1)"
 fi
 [[ -d "$SRC" ]] || { echo "Could not find a built cozyplay.app. Build it in Xcode first, or pass its path." >&2; exit 1; }
 
