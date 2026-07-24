@@ -1,101 +1,171 @@
-# cozyplay 🎉🔊
+# Cozyplay
 
-Turn every MacBook in the room into one big, **synchronized** speaker system. One
-laptop hosts the party; the others become extra speakers, and whatever plays on the
-host — Spotify, YouTube, anything — plays on all of them at once, in sync.
+Cozyplay turns Macs on the same local network into one synchronized speaker
+system. One Mac hosts the party and captures whatever it is playing. Every other
+Mac joins as a speaker, while the host also plays on the same delayed timeline.
 
-cozyplay is a native macOS app with its **own in-process sync engine** — pure Swift on
-Apple frameworks (Network.framework, AVFoundation/Core Audio, Accelerate). No helper
-binaries, no third-party audio driver, no GPL dependencies. It captures the host's
-system audio with the Core Audio process-tap API, streams timestamped PCM over the
-LAN, and every speaker (the host included) plays it against a shared clock with a
-drift-correcting servo. Target skew: **under 5 ms** (humans can't detect less);
-end-to-end delay is a tunable buffer, **150 ms by default** — tight enough that video
-is watchable, and far below the ~400 ms floor of the Snapcast-based design this
-replaced.
+The app is native SwiftUI and uses only Apple frameworks. There are no helper
+binaries, third-party audio drivers, accounts, cloud services, or runtime
+dependencies.
 
-> **Status: native engine milestones M-0…M-4 implemented.** Clock sync, streaming,
-> the drift servo, host self-playback, and the control channel are built with 31
-> passing unit tests. The remaining work is two-Mac field validation (skew
-> measurement, WiFi-chaos testing) and servo tuning.
+## Current status
+
+The native playback engine, local discovery, host playback, companion playback,
+speaker controls, diagnostics, and modern macOS interface are implemented. The
+automated engine suite currently contains 39 passing tests.
+
+Two-Mac field validation and further drift-servo tuning are still ongoing. Treat
+this as working development software rather than a finished audio product.
+
+## Features
+
+- Captures system audio from the host using the Core Audio process-tap API.
+- Streams timestamped 48 kHz S16LE PCM over the local network.
+- Discovers nearby parties automatically with Bonjour.
+- Synchronizes companions to the host with NTP-style clock measurements.
+- Plays the host and companions against one shared, buffered timeline.
+- Corrects long-running clock drift with subtle real-time resampling.
+- Controls each speaker's name, volume, mute state, and sync trim.
+- Exposes optional clock, buffer, and stream diagnostics.
+- Follows the Mac's light or dark appearance.
+- Uses native Liquid Glass on macOS 26 and a system-material fallback on older
+  supported releases.
 
 ## How it works
 
-```
+```text
  HOST                                                          COMPANION(S)
- system audio ─▶ Core Audio tap ─▶ S16LE @48k ─▶ AudioServer ──▶ TCP ──▶ StreamClient
-                      │              (20ms chunks stamped        │            │
-                now-playing meter     "play at host-time T")     │       SyncClock (NTP-style
-                                          │                      │        offset, ±1ms)
-                                          ▼                      │            ▼
-                                   local PlaybackEngine ◀────────┘      PlaybackEngine
-                                   (host's own speakers,           (timeline ring buffer +
-                                    same delayed timeline)          drift servo → speakers)
- Bonjour: the AudioServer listener advertises _cozyplay._tcp; companions browse & connect
+ system audio -> Core Audio tap -> S16LE @ 48k -> AudioServer -- TCP -> StreamClient
+                       |               20 ms timestamped chunks             |
+                  level meter                    |                       SyncClock
+                                                 v                          v
+                                      local PlaybackEngine           PlaybackEngine
+                                      same delayed timeline      timeline buffer + servo
+
+ Bonjour: AudioServer advertises _cozyplay._tcp; companions browse and connect.
 ```
 
-- **One clock.** All chunks carry play-at timestamps in the host's uptime clock.
-  Each companion measures its offset to the host with NTP-style pings (min-RTT
-  filtered, median-of-best; ~0.3–1 ms accuracy on party WiFi).
-- **One timeline.** Chunks land in a position-addressed ring buffer; the render
-  callback compares "where the DAC is" (host time + measured output latency) with
-  what it's playing and corrects drift by micro-resampling (±2000 ppm — inaudible).
-  Missing data plays as silence and recovers at the right instant automatically.
-- **The host is just another speaker.** The tap mutes the original output and the
-  host plays the same delayed timeline through an in-process client, so every
-  laptop — host included — is aligned.
+Every audio chunk carries a target time in the host's uptime clock. Companions
+estimate their offset from that clock using minimum-RTT-filtered pings, then place
+the chunks in a position-addressed ring buffer. The render engine compares its
+playback position with the shared timeline and corrects small drift through
+micro-resampling.
+
+The original host output is normally muted. The host then renders the captured
+stream through its own `PlaybackEngine`, making it another synchronized speaker
+instead of playing ahead of the room.
+
+The default end-to-end buffer is 150 ms and can be adjusted while hosting. The
+design target is less than 5 ms of speaker-to-speaker skew, but real-world results
+depend on hardware, output latency, and network conditions.
 
 ## Requirements
 
-- macOS 14.4+ (process-tap API floor), Apple Silicon
-- Xcode 26+, [`xcodegen`](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`)
+- macOS 14.4 or later
+- Apple Silicon Mac
+- Xcode 26 or later
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen)
 
-## Quick start (local development)
+Install XcodeGen with Homebrew:
+
+```bash
+brew install xcodegen
+```
+
+## Build and run
+
+Generate the Xcode project from `project.yml`:
 
 ```bash
 xcodegen generate
 open cozyplay.xcodeproj
 ```
 
-In Xcode, set your Signing Team on the `cozyplay` target (System Audio capture needs a
-**stable signing identity** — an ad-hoc build never gets the permission prompt), then
-Run. Pick **Host a party** on one Mac and **Join a party** on another on the same
-Wi-Fi.
+In Xcode, select your development team for the `cozyplay` target and run the app.
+A stable signing identity is required for macOS to retain the system-audio capture
+permission correctly.
 
-Run the tests with `xcodebuild -scheme cozyplay test` (or ⌘U).
+Choose **Host a party** on one Mac and **Find Nearby** on another Mac connected to
+the same Wi-Fi network. Approve the system-audio and local-network permission
+prompts when macOS presents them.
 
-### Field-measuring clock sync (no audio needed)
+## Tests
 
 ```bash
-# On the host Mac:
+xcodebuild \
+  -project cozyplay.xcodeproj \
+  -scheme cozyplay \
+  -configuration Debug \
+  CODE_SIGNING_ALLOWED=NO \
+  test
+```
+
+The tests cover protocol framing, clock synchronization, timestamp placement,
+chunk assembly, and the timeline ring buffer without launching the app or
+requesting system permissions.
+
+## Clock-sync field measurement
+
+The debug build includes a clock measurement mode that does not require audio:
+
+```bash
+# Host Mac
 COZYPLAY_CLOCKSPIKE=host ./cozyplay.app/Contents/MacOS/cozyplay
-# On the other Mac:
-COZYPLAY_CLOCKSPIKE=client COZYPLAY_SPIKE_HOST=<host-ip> ./cozyplay.app/Contents/MacOS/cozyplay
+
+# Companion Mac
+COZYPLAY_CLOCKSPIKE=client \
+COZYPLAY_SPIKE_HOST=<host-ip> \
+./cozyplay.app/Contents/MacOS/cozyplay
 ```
 
-The client prints offset/RTT once a second; wander should stay within ±1 ms over
-10+ minutes, even while a big file copy saturates the network.
+The client logs its measured offset and round-trip time once per second.
 
-## Building a shareable .app
+## Shareable builds
+
+Build the app, then create a separately signed copy:
 
 ```bash
-xcodebuild -project cozyplay.xcodeproj -scheme cozyplay -configuration Debug build
-scripts/sign-for-sharing.sh     # ad-hoc by default; pass CODESIGN_IDENTITY for Developer ID
+xcodebuild \
+  -project cozyplay.xcodeproj \
+  -scheme cozyplay \
+  -configuration Debug \
+  build
+
+scripts/sign-for-sharing.sh
 ```
 
-The app is a single Mach-O — no nested helpers or dylibs to re-sign, and nothing to
-trip notarization.
+The script uses ad-hoc signing by default. Pass a Developer ID identity through
+`CODESIGN_IDENTITY` when preparing a stable host build:
+
+```bash
+CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" \
+scripts/sign-for-sharing.sh
+```
+
+## Privacy and networking
+
+Cozyplay communicates directly between Macs on the local network. It has no user
+accounts, analytics, advertising, remote API, or cloud backend. Audio is streamed
+to peers that explicitly join the advertised local party and is not written to
+disk by the app.
+
+The app is currently not sandboxed while the native audio engine is under active
+development. Its entitlements and permission descriptions are available in
+`Support/`.
 
 ## Project layout
 
-| Path | What |
-|------|------|
-| `Sources/App` | App entry, role state |
-| `Sources/Views` | SwiftUI screens (role picker, host grid, join, speaker tile) |
-| `Sources/Controllers` | `HostController` / `JoinController` orchestration |
-| `Sources/Audio` | Core Audio tap, PCM conversion, level meter |
-| `Sources/Engine` | The sync engine: clock sync, wire protocol, host server, stream client, playback + drift servo, ring buffer |
-| `Sources/Discovery` | Bonjour browse (the engine's listener advertises) |
-| `Tests/` | Unit tests: protocol framing, clock-offset math, chunk/ring buffers |
-| `Support/` | Info.plist, entitlements |
-| `scripts/sign-for-sharing.sh` | re-sign a build so it runs on other Macs |
+| Path | Purpose |
+| --- | --- |
+| `Sources/App` | App entry point, settings, and top-level role state |
+| `Sources/Views` | Native SwiftUI role, host, join, speaker, and settings views |
+| `Sources/Controllers` | Host and companion orchestration |
+| `Sources/Audio` | System capture, PCM conversion, and level metering |
+| `Sources/Engine` | Protocol, clocks, buffering, server, client, and playback |
+| `Sources/Discovery` | Bonjour party discovery |
+| `Tests` | Headless engine and protocol tests |
+| `Resources` | Application icon |
+| `Support` | Info.plist and entitlements |
+| `scripts` | Build and signing utilities |
+
+`project.yml` is the source of truth for the generated Xcode project.

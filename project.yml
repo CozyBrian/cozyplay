@@ -25,10 +25,8 @@ targets:
         buildPhase: resources
     settings:
       base:
-        # Keep signing/bundle identity here (NOT in Xcode's target editor) —
-        # xcodegen regenerates the .xcodeproj and wipes direct edits.
+        # Keep the bundle identity here; xcodegen replaces direct project edits.
         PRODUCT_BUNDLE_IDENTIFIER: dev.cozybrian.cozyplay
-        DEVELOPMENT_TEAM: 3L7TNSC992
         PRODUCT_NAME: cozyplay
         INFOPLIST_FILE: Support/Info.plist
         CODE_SIGN_ENTITLEMENTS: Support/cozyplay.entitlements
@@ -53,7 +51,6 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.cozybrian.cozyplayTests
-        DEVELOPMENT_TEAM: 3L7TNSC992
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_OBJC_BRIDGING_HEADER: Sources/Engine/RTAtomics.h
 

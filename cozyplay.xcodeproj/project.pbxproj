@@ -281,11 +281,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					265CA74A396E8899FD0B5423 = {
-						DevelopmentTeam = 3L7TNSC992;
 						ProvisioningStyle = Automatic;
-					};
-					B846B2A9719009E32CAF1E7D = {
-						DevelopmentTeam = 3L7TNSC992;
 					};
 				};
 			};
@@ -394,7 +390,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -414,7 +409,6 @@
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -559,7 +553,6 @@
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -577,7 +570,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 3L7TNSC992;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
