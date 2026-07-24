@@ -6,6 +6,7 @@ import Foundation
 enum AppSettings {
     static let defaultBufferMsKey = "cozyplay.defaultBufferMs"
     static let displayNameOverrideKey = "cozyplay.displayNameOverride"
+    static let defaultPartyNameKey = "cozyplay.defaultPartyName"
     static let showDiagnosticsKey = "cozyplay.showDiagnostics"
     static let keepSourceAudibleKey = "cozyplay.keepSourceAudible"
 
@@ -43,10 +44,23 @@ enum AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: keepSourceAudibleKey) }
     }
 
+    /// Preferred party name when hosting ("" = derive from the device name).
+    static var defaultPartyName: String {
+        get { UserDefaults.standard.string(forKey: defaultPartyNameKey) ?? "" }
+        set { UserDefaults.standard.set(newValue, forKey: defaultPartyNameKey) }
+    }
+
     /// The name this Mac uses in parties.
     static func deviceName() -> String {
         let override = displayNameOverride.trimmingCharacters(in: .whitespaces)
         if !override.isEmpty { return override }
         return Host.current().localizedName ?? "MacBook"
+    }
+
+    /// The party name this Mac hosts with.
+    static func partyName() -> String {
+        let stored = defaultPartyName.trimmingCharacters(in: .whitespaces)
+        if !stored.isEmpty { return stored }
+        return "\(deviceName())’s party"
     }
 }

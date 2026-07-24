@@ -1,138 +1,183 @@
 import SwiftUI
 
-/// Host role: now-playing meter + a grid of speaker tiles for everyone in the party.
+/// Host role: a receiver-style rail with the live meter, then the speaker rack.
 struct HostView: View {
     @EnvironmentObject private var appState: AppState
     @ObservedObject var controller: HostController
     @AppStorage(AppSettings.showDiagnosticsKey) private var showDiagnostics = false
     @State private var showingPartySettings = false
 
-    private let columns = [GridItem(.adaptive(minimum: 200), spacing: 16)]
-
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-            content
-        }
-    }
-
-    private var header: some View {
-        HStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(controller.partyName).font(.title2.bold())
-                Text(controller.statusText).font(.callout).foregroundStyle(.secondary)
-            }
-            Spacer()
-            NowPlayingMeter(level: controller.level, active: controller.isCapturing)
-            Button {
-                showingPartySettings.toggle()
-            } label: {
-                Image(systemName: "gearshape")
-            }
-            .help("Party settings")
-            .popover(isPresented: $showingPartySettings, arrowEdge: .bottom) {
-                PartySettingsPopover(controller: controller)
-            }
-            Button(role: .destructive) { appState.backToPicker() } label: {
-                Label("End party", systemImage: "stop.circle")
-            }
-        }
-        .padding()
-    }
-
-    @ViewBuilder private var content: some View {
         ScrollView {
-            if let error = controller.errorText {
-                banner(error)
-            }
-            if controller.speakers.isEmpty {
-                emptyState
-            } else {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(controller.speakers) { speaker in
-                        DeviceTileView(speaker: speaker, controller: controller)
-                    }
+            VStack(spacing: CozySpacing.large) {
+                if let error = controller.errorText {
+                    CozyErrorBanner(text: error)
                 }
-                .padding()
+
+                receiverRail
+
+                VStack(spacing: CozySpacing.small) {
+                    CozySectionHeader(
+                        title: "Speakers",
+                        detail: controller.speakers.isEmpty
+                            ? "Waiting for devices"
+                            : "\(controller.speakers.count) connected"
+                    )
+                    speakerRack
+                }
+
+                if showDiagnostics, let diagnostics = controller.diagnostics {
+                    HostDiagnosticsPanel(diagnostics: diagnostics)
+                }
             }
-            if showDiagnostics, let diagnostics = controller.diagnostics {
-                HostDiagnosticsPanel(diagnostics: diagnostics)
-                    .padding([.horizontal, .bottom])
+            .frame(maxWidth: 760)
+            .padding(CozySpacing.large)
+            .frame(maxWidth: .infinity)
+        }
+        .navigationTitle(controller.partyName)
+        .toolbarBackground(.hidden, for: .windowToolbar)
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+                Text("Cozyplay")
+                    .font(CozyFont.caption)
+                    .kerning(1.1)
+                    .textCase(.uppercase)
+                    .foregroundStyle(CozyColor.textSecondary.opacity(0.85))
+                    .padding(.horizontal, CozySpacing.small)
+                    .accessibilityHidden(true)
+            }
+
+            if #available(macOS 26.0, *) {
+                ToolbarSpacer(.flexible)
+            }
+
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button("Party Settings", systemImage: "slider.horizontal.3") {
+                    showingPartySettings.toggle()
+                }
+                .help("Party-wide playback delay")
+                .popover(isPresented: $showingPartySettings, arrowEdge: .bottom) {
+                    PartySettingsPopover(controller: controller)
+                }
+
+                Button(role: .destructive, action: appState.backToPicker) {
+                    Label("End Party", systemImage: "stop.fill")
+                        .foregroundStyle(CozyColor.accent)
+                }
+                .help("Stop hosting and disconnect every speaker")
             }
         }
     }
 
-    private var emptyState: some View {
-        VStack(spacing: 10) {
-            ProgressView().controlSize(.large)
-            Text("Waiting for laptops to join…")
-                .font(.title3).foregroundStyle(.secondary)
-            Text("On another MacBook, open cozyplay and tap “Join a party”.")
-                .font(.callout).foregroundStyle(.tertiary)
+    /// The console faceplate: party name, live chip, level meter, status line.
+    private var receiverRail: some View {
+        VStack(alignment: .leading, spacing: CozySpacing.small) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(controller.partyName)
+                    .font(CozyFont.railTitle)
+                    .foregroundStyle(CozyColor.textPrimary)
+                    .lineLimit(1)
+                Spacer()
+                CozyStatusChip(
+                    text: controller.isCapturing ? "Live" : "Starting",
+                    color: controller.isCapturing ? CozyColor.success : CozyColor.tint
+                )
+            }
+
+            CozyVUMeter(level: controller.level, active: controller.isCapturing)
+
+            Text(railCaption)
+                .font(CozyFont.caption)
+                .foregroundStyle(CozyColor.textSecondary)
+                .monospacedDigit()
         }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 80)
+        .cozyCard(padding: CozySpacing.large)
     }
 
-    private func banner(_ text: String) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-            Text(text).font(.callout)
-            Spacer()
+    private var railCaption: String {
+        guard controller.isCapturing else { return "Preparing audio capture…" }
+        let count = controller.speakers.count
+        let speakers = count == 1 ? "1 speaker" : "\(count) speakers"
+        return "\(controller.bufferMs) ms delay · \(speakers)"
+    }
+
+    private var speakerRack: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(controller.speakers.enumerated()), id: \.element.id) { index, speaker in
+                if index > 0 {
+                    CozyRackSeparator(leadingInset: 64)
+                }
+                DeviceTileView(speaker: speaker, controller: controller)
+                    .transition(.opacity)
+            }
+
+            if !controller.speakers.isEmpty {
+                CozyRackSeparator(leadingInset: 64)
+            }
+            inviteRow
         }
-        .padding()
-        .background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
-        .padding([.horizontal, .top])
+        .animation(.smooth(duration: 0.25), value: controller.speakers.map(\.id))
+        .cozyRack()
+    }
+
+    private var inviteRow: some View {
+        HStack(spacing: CozySpacing.small) {
+            CozyIconChip(systemImage: "wave.3.right", color: CozyColor.textSecondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Add another Mac")
+                    .font(CozyFont.detail)
+                    .foregroundStyle(CozyColor.textPrimary)
+                Text("Open Cozyplay on it and choose Find Nearby.")
+                    .font(CozyFont.caption)
+                    .foregroundStyle(CozyColor.textSecondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(CozySpacing.medium)
+        .accessibilityElement(children: .combine)
     }
 }
 
-/// Live party settings (gear popover on the host).
 private struct PartySettingsPopover: View {
     @ObservedObject var controller: HostController
+    @State private var bufferMs: Double
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Playback delay").font(.headline)
-            HStack {
-                Slider(
-                    value: Binding(
-                        get: { Double(controller.bufferMs) },
-                        set: { controller.setBuffer(ms: Int($0 / 10) * 10) }
-                    ),
-                    in: Double(EngineConstants.minBufferMs)...Double(EngineConstants.maxBufferMs)
-                )
-                .frame(width: 220)
-                Text("\(controller.bufferMs) ms")
-                    .font(.body.monospacedDigit())
-                    .frame(width: 56, alignment: .trailing)
-            }
-            Text("Applies immediately to every speaker. Raise it if audio drops out on busy Wi-Fi; lower it for tighter video sync.")
-                .font(.caption).foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(16)
-        .frame(width: 320)
+    init(controller: HostController) {
+        self.controller = controller
+        _bufferMs = State(initialValue: Double(controller.bufferMs))
     }
-}
-
-/// A simple animated level bar for the master's captured audio.
-struct NowPlayingMeter: View {
-    let level: Float
-    let active: Bool
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: active ? "waveform" : "waveform.slash")
-                .foregroundStyle(active ? .green : .secondary)
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule().fill(.quaternary)
-                    Capsule().fill(.green)
-                        .frame(width: geo.size.width * CGFloat(max(0.02, min(1, level))))
+        VStack(alignment: .leading, spacing: CozySpacing.medium) {
+            HStack {
+                Text("Playback delay")
+                    .font(CozyFont.sectionTitle)
+                    .foregroundStyle(CozyColor.textPrimary)
+                Spacer()
+                Text("\(Int(bufferMs)) ms")
+                    .font(CozyFont.body)
+                    .monospacedDigit()
+                    .foregroundStyle(CozyColor.textSecondary)
+            }
+
+            Slider(
+                value: $bufferMs,
+                in: Double(EngineConstants.minBufferMs)...Double(EngineConstants.maxBufferMs),
+                step: 10
+            ) { editing in
+                if !editing {
+                    controller.setBuffer(ms: Int(bufferMs))
                 }
             }
-            .frame(width: 120, height: 8)
+            .accessibilityLabel("Playback delay")
+            .accessibilityValue("\(Int(bufferMs)) milliseconds")
+
+            Text("Raise the delay if audio drops out on busy Wi-Fi. Lower it for tighter video sync.")
+                .font(CozyFont.caption)
+                .foregroundStyle(CozyColor.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .padding(CozySpacing.large)
+        .frame(width: 340)
     }
 }

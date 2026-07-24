@@ -12,14 +12,22 @@ struct cozyplayApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .environmentObject(appState)
-                .frame(minWidth: 720, minHeight: 460)
+            NavigationStack {
+                RootView()
+            }
+            .environmentObject(appState)
+            .tint(CozyColor.tint)
+            .fontDesign(.rounded)
+            .frame(minWidth: 720, minHeight: 460)
         }
+        .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentMinSize)
+        .defaultSize(width: 900, height: 620)
 
         Settings {
             SettingsView()
+                .tint(CozyColor.tint)
+                .fontDesign(.rounded)
         }
     }
 }
@@ -29,17 +37,23 @@ struct RootView: View {
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
-        content
-            .onAppear {
-                #if DEBUG
-                // Headless-ish verification hook: COZYPLAY_AUTOHOST=<name> starts
-                // hosting immediately (diagnostics land in os.log).
-                if appState.mode == .picker,
-                   let name = ProcessInfo.processInfo.environment["COZYPLAY_AUTOHOST"] {
-                    appState.startHosting(partyName: name.isEmpty ? "Debug Party" : name)
-                }
-                #endif
+        ZStack {
+            content
+                .transition(.opacity)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CozyColor.background)
+        .animation(.smooth(duration: 0.25), value: appState.mode)
+        .onAppear {
+            #if DEBUG
+            // Headless-ish verification hook: COZYPLAY_AUTOHOST=<name> starts
+            // hosting immediately (diagnostics land in os.log).
+            if appState.mode == .picker,
+               let name = ProcessInfo.processInfo.environment["COZYPLAY_AUTOHOST"] {
+                appState.startHosting(partyName: name.isEmpty ? "Debug Party" : name)
             }
+            #endif
+        }
     }
 
     @ViewBuilder private var content: some View {

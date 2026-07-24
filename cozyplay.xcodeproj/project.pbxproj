@@ -23,6 +23,7 @@
 		4CE4C17FDE82179F17D3AACD /* cozyplayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A40F1F0C474B8D84913A6B4 /* cozyplayApp.swift */; };
 		4ECF5499D748709E31D15D4C /* DeviceTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */; };
 		55EC09F57BF939408F769BA5 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB06945DDB8C014E5F35922 /* AppSettings.swift */; };
+		59BF772E4E62B6F0050D7205 /* CozyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF3D510599D5EC3D1FEF4D3 /* CozyTheme.swift */; };
 		59E3758AF7123ED13C069FEA /* WireProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */; };
 		5E17CD5B89B369A7A82062F4 /* PlaybackEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87313636070F8F8E1D5D0EAC /* PlaybackEngine.swift */; };
 		6D939752599C5A900E921C8A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541B42AC68F1A0FEBD0ECC53 /* SettingsView.swift */; };
@@ -94,6 +95,7 @@
 		D47E52339D9060A4C233BB27 /* cozyplay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cozyplay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D92121F282E73398A9BB9DCA /* JoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinView.swift; sourceTree = "<group>"; };
 		DA0886F7096FFCDA4CBD717C /* WireProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WireProtocolTests.swift; sourceTree = "<group>"; };
+		EDF3D510599D5EC3D1FEF4D3 /* CozyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CozyTheme.swift; sourceTree = "<group>"; };
 		F0611C6D2A6A29AA50F2B4A8 /* SyncClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncClock.swift; sourceTree = "<group>"; };
 		FCB06945DDB8C014E5F35922 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		FF90D635D2718C66F3F46450 /* SyncClockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncClockTests.swift; sourceTree = "<group>"; };
@@ -221,6 +223,7 @@
 		EF1101F4E0911002394EA262 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				EDF3D510599D5EC3D1FEF4D3 /* CozyTheme.swift */,
 				5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */,
 				4B5930375862508EC41DC024 /* HostView.swift */,
 				D92121F282E73398A9BB9DCA /* JoinView.swift */,
@@ -329,6 +332,7 @@
 				D977DF77E3845348F46F027E /* BonjourBrowser.swift in Sources */,
 				39DDA62B4E90F7A8983D9FEE /* ChunkAssembler.swift in Sources */,
 				87C24DE5E1220C685CFEDD25 /* ClockSyncSpike.swift in Sources */,
+				59BF772E4E62B6F0050D7205 /* CozyTheme.swift in Sources */,
 				4ECF5499D748709E31D15D4C /* DeviceTileView.swift in Sources */,
 				402425ADF77FB630A8B1EF66 /* EngineConstants.swift in Sources */,
 				79B322889F654897945948B4 /* HostClock.swift in Sources */,
