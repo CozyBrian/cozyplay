@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0E5665644590D0BEAD942112 /* PCMConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6FFF911E5F508E8B232015 /* PCMConverter.swift */; };
+		127607EDFF0948EDE577062C /* cozyplay.icon in Resources */ = {isa = PBXBuildFile; fileRef = 58EB21D2493A4A9CC2832FDF /* cozyplay.icon */; };
 		17C8617125682AAE4C5ABD1E /* TimelineRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A2C098890FA75F28A5B051 /* TimelineRingBuffer.swift */; };
 		1B8C2C5ECEC2216B46119ED4 /* HostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD017D40A1DE2CB0077113F5 /* HostController.swift */; };
 		1DB68296FC68B047081AD129 /* TimelinePlacerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942D6414F2BDDC832428544C /* TimelinePlacerTests.swift */; };
@@ -19,7 +20,6 @@
 		4010DF0B6C0E64CAE961F295 /* AudioMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEB761FD235CD38481075ED /* AudioMeter.swift */; };
 		402425ADF77FB630A8B1EF66 /* EngineConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D1B1F14D823222FAC2418E /* EngineConstants.swift */; };
 		4147DD012E9C52E629A63ADD /* PCMConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6FFF911E5F508E8B232015 /* PCMConverter.swift */; };
-		46671468E648C2551BAAB3C0 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A92A366CE990C238235E275F /* AppIcon.icns */; };
 		4CE4C17FDE82179F17D3AACD /* cozyplayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A40F1F0C474B8D84913A6B4 /* cozyplayApp.swift */; };
 		4ECF5499D748709E31D15D4C /* DeviceTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */; };
 		55EC09F57BF939408F769BA5 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB06945DDB8C014E5F35922 /* AppSettings.swift */; };
@@ -74,6 +74,7 @@
 		39F9E7E9DAC361DC19E2F2CC /* WireProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WireProtocol.swift; sourceTree = "<group>"; };
 		4B5930375862508EC41DC024 /* HostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostView.swift; sourceTree = "<group>"; };
 		541B42AC68F1A0FEBD0ECC53 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		58EB21D2493A4A9CC2832FDF /* cozyplay.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = cozyplay.icon; sourceTree = "<group>"; };
 		5E2EF7D0CC2669EC63E25C0C /* TimelinePlacer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePlacer.swift; sourceTree = "<group>"; };
 		5F98C7442D6AFA76C9E2AEDB /* DeviceTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTileView.swift; sourceTree = "<group>"; };
 		6026B661C662AFCF34F9314B /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
@@ -83,7 +84,6 @@
 		942D6414F2BDDC832428544C /* TimelinePlacerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePlacerTests.swift; sourceTree = "<group>"; };
 		A1492F8A6403FE099E38F3CD /* Party.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Party.swift; sourceTree = "<group>"; };
 		A4E48DE535FFCCB1E10DE439 /* AudioServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServer.swift; sourceTree = "<group>"; };
-		A92A366CE990C238235E275F /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		BB6E6BFF1D9D750FB5976BFB /* ChunkAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkAssembler.swift; sourceTree = "<group>"; };
 		BF4EDDA666710D4B283094A7 /* RTAtomics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RTAtomics.h; sourceTree = "<group>"; };
 		C2046BA0B94357FBFCC77411 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -205,7 +205,7 @@
 		BD6F3107CEDE0347989B3B8F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A92A366CE990C238235E275F /* AppIcon.icns */,
+				58EB21D2493A4A9CC2832FDF /* cozyplay.icon */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -310,7 +310,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				46671468E648C2551BAAB3C0 /* AppIcon.icns in Resources */,
+				127607EDFF0948EDE577062C /* cozyplay.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,7 +405,7 @@
 		5C2E7B9E20576DD9BE6895FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = cozyplay;
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -549,7 +549,7 @@
 		85C345F7E37A5D47CA4F2C67 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = cozyplay;
 				CODE_SIGN_ENTITLEMENTS = Support/cozyplay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;

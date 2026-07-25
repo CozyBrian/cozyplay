@@ -28,6 +28,7 @@ targets:
         # Keep the bundle identity here; xcodegen replaces direct project edits.
         PRODUCT_BUNDLE_IDENTIFIER: dev.cozybrian.cozyplay
         PRODUCT_NAME: cozyplay
+        ASSETCATALOG_COMPILER_APPICON_NAME: cozyplay
         INFOPLIST_FILE: Support/Info.plist
         CODE_SIGN_ENTITLEMENTS: Support/cozyplay.entitlements
         CODE_SIGN_STYLE: Automatic

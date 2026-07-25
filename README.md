@@ -164,7 +164,7 @@ development. Its entitlements and permission descriptions are available in
 | `Sources/Engine` | Protocol, clocks, buffering, server, client, and playback |
 | `Sources/Discovery` | Bonjour party discovery |
 | `Tests` | Headless engine and protocol tests |
-| `Resources` | Application icon |
+| `Resources` | Icon Composer application icon |
 | `Support` | Info.plist and entitlements |
 | `scripts` | Build and signing utilities |
 
